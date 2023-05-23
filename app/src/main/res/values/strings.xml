@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Vinteddu-Android</string>
+    <string name="title">Vinteddu</string>
+    <string name="login_username">Username or e-mail</string>
+    <string name="login_password">Password</string>
+    <string name="login">Sign in</string>
+    <string name="register">New user? Sign up here.</string>
 </resources>
