@@ -31,6 +31,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import it.unical.gciaoo.vinteddu_android.ui.theme.VintedduAndroidTheme
+import it.unical.gciaoo.vinteddu_android.viewmodels.AddressFormViewModel
+import it.unical.gciaoo.vinteddu_android.viewmodels.UserFormViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +58,7 @@ fun NavigationView(navHostController: NavHostController) {
             Login(navHostController = navHostController)
         }
         composable("login/new") {
-            Register()
+            Register(userFormViewModel = UserFormViewModel(), addressFormViewModel = AddressFormViewModel())
         }
     }
 }
