@@ -4,13 +4,13 @@ import java.time.LocalDate
 
 class User(
     private val id: Long,
-    private val username: String,
-    private val firstName: String,
-    private val lastName: String,
-    private val email: String,
-    private val birthDate: LocalDate,
+    val username: String,
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+    val birthDate: LocalDate,
     private val address: Address,
-    private val phoneNumber: String,
+    val phoneNumber: String,
 ) {
     companion object {
         fun validateUsername(username: String): Boolean {

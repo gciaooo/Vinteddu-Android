@@ -23,4 +23,6 @@
     <string name="user_nameemailerror">Username/E-mail error</string>
     <string name="user_shippingerror">Address error</string>
     <string name="user_passworderror">Password error</string>
+    <string name="profile">Profilo</string>
+
 </resources>
