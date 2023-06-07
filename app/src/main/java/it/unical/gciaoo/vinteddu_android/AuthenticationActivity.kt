@@ -25,6 +25,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,12 +37,18 @@ import androidx.navigation.NavHostController
 import it.unical.gciaoo.vinteddu_android.ui.theme.Typography
 import it.unical.gciaoo.vinteddu_android.viewmodels.AddressFormViewModel
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserFormViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun Login(navHostController: NavHostController) {
+fun Login(navHostController: NavHostController, apiService: ApiService) {
     val commonModifier = Modifier
         .fillMaxWidth()
         .padding(20.dp)
+
+
+    val coroutineScope = rememberCoroutineScope()
+    val usernameState = remember { mutableStateOf("") }
+    val passwordState = remember { mutableStateOf("") }
     Column(
         modifier = Modifier.padding(all = 5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -55,8 +62,8 @@ fun Login(navHostController: NavHostController) {
                 .weight(0.3f)
         )
         Spacer(modifier = Modifier.weight(0.2f))
-        InputField(name = stringResource(R.string.login_username), commonModifier)
-        InputField(name = stringResource(R.string.login_password), commonModifier)
+        InputField(name = stringResource(R.string.login_username), commonModifier, usernameState)
+        InputField(name = stringResource(R.string.login_password), commonModifier, passwordState)
         Button(content = {
             Text(stringResource(R.string.login))
 
@@ -65,7 +72,17 @@ fun Login(navHostController: NavHostController) {
                 .padding(vertical = 30.dp)
                 .height(IntrinsicSize.Max),
             onClick = {
+                val username = usernameState.value
+                val password = passwordState.value
 
+                coroutineScope.launch {
+                    try {
+                        apiService.authenticate(username, password)
+                        navHostController.navigate("Profile")
+                    } catch (e: Exception) {
+                        // Si è verificato un errore durante la chiamata API
+                    }
+                }
             }
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -271,7 +288,7 @@ fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: Address
 }
 
 @Composable
-fun InputField(name: String, modifier: Modifier) {
+fun InputField(name: String, modifier: Modifier, usernameState: Any?) {
     var field by remember { mutableStateOf("") }
     Row(horizontalArrangement = Arrangement.Center) {
         TextField(

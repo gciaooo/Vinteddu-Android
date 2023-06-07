@@ -87,7 +87,7 @@ fun NavigationView(navHostController: NavHostController) {
             }
         }
         composable(Routes.LOGIN.route) {
-            Login(navHostController = navHostController)
+            Login(navHostController = navHostController, apiService = RetrofitClient.create())
         }
         composable(Routes.REGISTER.route) {
             Register(
