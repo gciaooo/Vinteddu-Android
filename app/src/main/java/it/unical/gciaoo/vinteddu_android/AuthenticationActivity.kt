@@ -20,6 +20,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -291,12 +292,13 @@ fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: Address
 }
 
 @Composable
-fun InputField(name: String, modifier: Modifier, usernameState: Any?) {
-    var field by remember { mutableStateOf("") }
+fun InputField(name: String, modifier: Modifier, usernameState: MutableState<String>) {
+    //var field by remember { mutableStateOf("") }
     Row(horizontalArrangement = Arrangement.Center) {
         TextField(
-            value = field,
-            onValueChange = { field = it },
+            value = usernameState.value,
+            onValueChange = { newValue ->
+                usernameState.value = newValue },
             label = { Text(name) },
             singleLine = true,
             modifier = modifier.padding(vertical = 5.dp)
