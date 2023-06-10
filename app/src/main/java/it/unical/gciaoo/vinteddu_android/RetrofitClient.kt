@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitClient {
     companion object {
-        private const val BASE_URL = "http://localhost:8080" // Sostituisci con l'URL del tuo backend
+        private const val BASE_URL = "http://:8080" // Mettere l'indirizzo ip del pc tra // e :
 
         fun create(): ApiService {
             val retrofit = Retrofit.Builder()

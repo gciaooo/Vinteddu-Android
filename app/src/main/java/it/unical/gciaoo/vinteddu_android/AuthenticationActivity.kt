@@ -77,8 +77,11 @@ fun Login(navHostController: NavHostController, apiService: ApiService) {
 
                 coroutineScope.launch {
                     try {
-                        apiService.authenticate(username, password)
-                        navHostController.navigate("Profile")
+                        val response = apiService.authenticate(username, password)
+                        if(response.isSuccessful){
+                            navHostController.navigate("Profile")
+                        }
+
                     } catch (e: Exception) {
                         // Si è verificato un errore durante la chiamata API
                     }

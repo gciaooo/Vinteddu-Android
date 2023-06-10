@@ -18,7 +18,7 @@ interface ApiService {
     @GET("/{userId}/Account")
     suspend fun getAccount(@Path("userId") userId: String): Response<User>
     @FormUrlEncoded
-    @POST("/authenticate")
+    @POST("/api/v1/authenticate")
     suspend fun authenticate(
         @Field("username") username: String,
         @Field("password") password: String
