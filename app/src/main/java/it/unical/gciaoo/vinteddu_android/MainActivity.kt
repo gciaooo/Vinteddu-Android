@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,16 +50,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwts
 import it.unical.gciaoo.vinteddu_android.ui.theme.VintedduAndroidTheme
 import it.unical.gciaoo.vinteddu_android.viewmodels.AddressFormViewModel
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserFormViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 
 
 class MainActivity : ComponentActivity() {
+    private lateinit var sessionManager: SessionManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             VintedduAndroidTheme {
                 // A surface container using the 'background' color from the theme
@@ -87,7 +93,9 @@ fun NavigationView(navHostController: NavHostController) {
             }
         }
         composable(Routes.LOGIN.route) {
-            Login(navHostController = navHostController, apiService = RetrofitClient.create())
+            val context = LocalContext.current
+            val sessionManager = remember { SessionManager(context) }
+            Login(navHostController = navHostController, apiService = RetrofitClient.create(sessionManager))
         }
         composable(Routes.REGISTER.route) {
             Register(
@@ -96,7 +104,9 @@ fun NavigationView(navHostController: NavHostController) {
             )
         }
         composable(Routes.PROFILE.route) {
-            Profile(userFormViewModel = UserFormViewModel(), apiService = RetrofitClient.create())
+            val context = LocalContext.current
+            val sessionManager = remember { SessionManager(context) }
+            Profile(userFormViewModel = UserFormViewModel(), apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
         }
 
     }
@@ -175,31 +185,23 @@ fun HomePage() {
 @Composable
 fun Profile(
     userFormViewModel: UserFormViewModel = UserFormViewModel(),
-    apiService: ApiService
+    apiService: ApiService,
+    sessionManager: SessionManager
+
 ) {
     val userState by userFormViewModel.userState.collectAsState()
     val errorMessageState = remember { mutableStateOf("") }
-    val userIdState = remember { mutableStateOf<Long?>(null) }
+    //val user_State = remember { mutableStateOf<String?>(null) }
 
+    val token = sessionManager.getToken();
+
+
+    val username = getUsernameFromToken(token);
     LaunchedEffect(Unit) {
         try {
-            val response = apiService.getCurrentUserId()
+            val response = apiService.getCurrentUser(username)
             if (response.isSuccessful) {
-                val userId = response.body()
-                userIdState.value = userId
-            } else {
-                //errore
-            }
-        } catch (e: Exception) {
-            //l'eccezione
-        }
-    }
-    val userId = userIdState.value
-    LaunchedEffect(Unit) {
-        try {
-            val response = apiService.getAccount(userId.toString())
-            if (response.isSuccessful) {
-                val account = response.body()
+                val account = response.body();
                 account?.let {
                     userFormViewModel.updateUsername(account.username)
                     userFormViewModel.updateFirstName(account.firstName)
@@ -298,4 +300,11 @@ fun Drawer(
             )
         }
     }
+}
+
+fun getUsernameFromToken(token: String?): String? {
+//    val claims: Claims = Jwts.parser().parseClaimsJwt(token).body
+//    return claims.subject
+    val claims: Claims = Jwts.parser().parseClaimsJws(token).body
+    return claims.subject
 }
