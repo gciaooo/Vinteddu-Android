@@ -4,14 +4,15 @@ import retrofit2.http.GET
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
 
 
-    @GET("/api/v1//users/{username}")
-    suspend fun getCurrentUser(@Path("username") username: String?) : Response<User>
+    @GET("/api/v2/user/{token}")
+    suspend fun getCurrentUser(@Header("Authorization") token:String?, @Path("token") token_: String?) : Response<User>
 
 
     @GET("/api/v1/{userId}/Account")
