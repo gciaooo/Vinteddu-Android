@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -194,21 +195,21 @@ fun Profile(
     //val user_State = remember { mutableStateOf<String?>(null) }
 
     val token = sessionManager.getToken();
+    //val username = sessionManager.getUsername(token);
 
-
-    val username = getUsernameFromToken(token);
+    //val username = getUsernameFromToken(token);
     LaunchedEffect(Unit) {
         try {
-            val response = apiService.getCurrentUser(username)
+            val response = apiService.getCurrentUser("Bearer $token", token)
             if (response.isSuccessful) {
                 val account = response.body();
                 account?.let {
                     userFormViewModel.updateUsername(account.username)
-                    userFormViewModel.updateFirstName(account.firstName)
-                    userFormViewModel.updateLastName(account.lastName)
-                    userFormViewModel.updateEmail(account.email)
-                    userFormViewModel.updateBirthDate(account.birthDate)
-                    userFormViewModel.updatePhoneNumber(account.phoneNumber)
+//                    userFormViewModel.updateFirstName(account.firstName)
+//                    userFormViewModel.updateLastName(account.lastName)
+//                    userFormViewModel.updateEmail(account.email)
+//                    userFormViewModel.updateBirthDate(account.birthDate)
+//                    userFormViewModel.updatePhoneNumber(account.phoneNumber)
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
