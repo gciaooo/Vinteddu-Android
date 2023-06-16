@@ -1,4 +1,5 @@
 package it.unical.gciaoo.vinteddu_android
+import it.unical.gciaoo.vinteddu_android.model.Item
 import it.unical.gciaoo.vinteddu_android.model.User
 import retrofit2.http.GET
 import retrofit2.Response
@@ -24,4 +25,6 @@ interface ApiService {
         @Field("password") password: String
     ): Response<Unit>
 
+    @GET("") //TODO: add api path
+    suspend fun getItem(@Path("itemId") itemId: String): Response<Item>
 }

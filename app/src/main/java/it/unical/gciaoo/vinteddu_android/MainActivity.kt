@@ -145,7 +145,6 @@ fun VintedduTopAppBar(
     )
 }
 
-@Preview
 @Composable
 fun HomePage() {
     val coroutineScope = rememberCoroutineScope()
@@ -188,7 +187,6 @@ fun Profile(
     userFormViewModel: UserFormViewModel = UserFormViewModel(),
     apiService: ApiService,
     sessionManager: SessionManager
-
 ) {
     val userState by userFormViewModel.userState.collectAsState()
     val errorMessageState = remember { mutableStateOf("") }
