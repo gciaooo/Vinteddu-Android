@@ -25,6 +25,6 @@ interface ApiService {
         @Field("password") password: String
     ): Response<Unit>
 
-    @GET("") //TODO: add api path
-    suspend fun getItem(@Path("itemId") itemId: String): Response<Item>
+    @GET("/api/v3/item/{itemId}") //TODO: add api path
+    suspend fun getItem(@Header("Authorization") token:String?, @Path("itemId") itemId: Long): Response<Item>
 }
