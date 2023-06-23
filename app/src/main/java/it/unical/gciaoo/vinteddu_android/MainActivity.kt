@@ -1,16 +1,20 @@
 package it.unical.gciaoo.vinteddu_android
 
 import android.os.Bundle
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
@@ -18,6 +22,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +38,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+<<<<<<< HEAD
+=======
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+>>>>>>> 9f0f1b7fa95a1affebd4e91c5a2930c4123e48f9
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,6 +54,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+<<<<<<< HEAD
+=======
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+>>>>>>> 9f0f1b7fa95a1affebd4e91c5a2930c4123e48f9
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
@@ -77,21 +97,21 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun NavigationView(navHostController: NavHostController) {
+fun NavigationView(setFabState: (Boolean) -> Unit, navHostController: NavHostController) {
     NavHost(navController = navHostController, startDestination = Routes.HOME.route) {
         composable(Routes.HOME.route) {
+            setFabState(true)
             //TODO: Main page
-            Box {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineLarge
-                )
-            }
+            MainPage()
         }
         composable(Routes.LOGIN.route) {
+            setFabState(false)
             val context = LocalContext.current
             val sessionManager = remember { SessionManager(context) }
-            Login(navHostController = navHostController, apiService = RetrofitClient.create(sessionManager))
+            Login(
+                navHostController = navHostController,
+                apiService = RetrofitClient.create(sessionManager)
+            )
         }
         composable(Routes.REGISTER.route) {
             Register(
@@ -100,17 +120,28 @@ fun NavigationView(navHostController: NavHostController) {
             )
         }
         composable(Routes.PROFILE.route) {
+            setFabState(false)
             val context = LocalContext.current
             val sessionManager = remember { SessionManager(context) }
+<<<<<<< HEAD
             val userViewModel = UserViewModel()
             val user = remember{User.Companion}
 
             Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
+=======
+            Profile(
+                userFormViewModel = UserFormViewModel(),
+                apiService = RetrofitClient.create(sessionManager),
+                sessionManager = sessionManager
+            )
+>>>>>>> 9f0f1b7fa95a1affebd4e91c5a2930c4123e48f9
         }
+//        composable(Routes.SEARCH.route) {
+//            SearchPage()
+//        }
 
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,12 +174,36 @@ fun VintedduTopAppBar(
     )
 }
 
+@Preview(showBackground = true)
+@Composable
+fun MainPage() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top,
+        modifier = Modifier.padding(horizontal = 30.dp).fillMaxHeight()
+    ) {
+        val textModifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        Spacer(Modifier.padding(vertical = 60.dp))
+        Text(
+            text = stringResource(R.string.welcome_title),
+            style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.Center,
+            modifier = textModifier
+        )
+        Text(
+            text = stringResource(R.string.welcome_subtitle),
+            style = MaterialTheme.typography.labelLarge,
+            textAlign = TextAlign.Center,
+            modifier = textModifier
+        )
+    }
+}
+
 @Composable
 fun HomePage() {
     val coroutineScope = rememberCoroutineScope()
     val navHostController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
+    val (fabState, setFabState) = remember { mutableStateOf(true) }
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -168,13 +223,26 @@ fun HomePage() {
                     coroutineScope = coroutineScope
                 )
             },
+            floatingActionButton = {
+                if (fabState) {
+                    ExtendedFloatingActionButton(onClick = {
+//                        navHostController.navigate(Routes.SEARCH.route)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = stringResource(R.string.search_button_icon)
+                        )
+                        Text(stringResource(R.string.search_button_text))
+                    }
+                }
+            }
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it), contentAlignment = Alignment.Center
             ) {
-                NavigationView(navHostController = navHostController)
+                NavigationView(setFabState = setFabState, navHostController = navHostController)
             }
         }
     }
