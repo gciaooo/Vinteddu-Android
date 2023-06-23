@@ -7,25 +7,25 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 
 data class UserState(
-    val username : String = "",
-    val firstName : String = "",
-    val lastName : String = "",
-    val email : String = "",
-    val password : String = "",
-    val birthDate : LocalDate = LocalDate.now(),
-    val phoneNumber : String = "",
+    val username: String = "",
+    val firstName: String = "",
+    val lastName: String = "",
+    val email: String = "",
+    val password: String = "",
+    val birthDate: LocalDate = LocalDate.now(),
+    val phoneNumber: String = "",
 
-    val passwordConfirm : String = "",
+    val passwordConfirm: String = "",
 
     val isUsernameError: Boolean = !User.validateUsername(username = username),
-    val isFirstNameError : Boolean = !User.validateFirstName(firstName = firstName),
-    val isLastNameError : Boolean = !User.validateLastName(lastName = lastName),
-    val isEmailError : Boolean = !User.validateEmail(email = email),
-    val isPasswordError : Boolean = !User.validatePassword(password = password),
-    val isBirthDateError : Boolean = !User.validateBirthDate(birthDate = birthDate),
-    val isPhoneNumberError : Boolean = !User.validatePhoneNumber(phoneNumber = phoneNumber),
+    val isFirstNameError: Boolean = !User.validateFirstName(firstName = firstName),
+    val isLastNameError: Boolean = !User.validateLastName(lastName = lastName),
+    val isEmailError: Boolean = !User.validateEmail(email = email),
+    val isPasswordError: Boolean = !User.validatePassword(password = password),
+    val isBirthDateError: Boolean = !User.validateBirthDate(birthDate = birthDate),
+    val isPhoneNumberError: Boolean = !User.validatePhoneNumber(phoneNumber = phoneNumber),
 
-    val isPasswordConfirmError : Boolean = passwordConfirm.isEmpty()
+    val isPasswordConfirmError: Boolean = passwordConfirm.isEmpty()
 )
 
 class UserFormViewModel {

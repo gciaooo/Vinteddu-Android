@@ -9,9 +9,11 @@ class User(
     val lastName: String,
     val email: String,
     val birthDate: LocalDate,
-    private val address: Address,
+    val address: String,
     val phoneNumber: String,
+
 ) {
+
     companion object {
         fun validateUsername(username: String): Boolean {
             if (username.length in 1..20) {

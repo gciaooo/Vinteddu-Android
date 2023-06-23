@@ -1,8 +1,8 @@
-package it.unical.gciaoo.vinteddu_android
+package it.unical.gciaoo.vinteddu_android.ApiConfig
 
 import android.content.Context
 import android.content.SharedPreferences
-import io.jsonwebtoken.Jwts
+
 
 class SessionManager(context: Context) {
 
@@ -17,11 +17,7 @@ class SessionManager(context: Context) {
         editor.apply()
     }
 
-    fun getUsername(token : String?): String? {
-        val jwtParser = Jwts.parserBuilder().setSigningKey(secretKey).build()
-        val claims = jwtParser.parseClaimsJws(token).body
-        return claims["username"] as? String
-    }
+
 
     fun clearUsername() {
         editor.remove("Username")

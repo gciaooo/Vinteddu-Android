@@ -3,9 +3,7 @@ package it.unical.gciaoo.vinteddu_android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -34,10 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,27 +39,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
+import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
+import it.unical.gciaoo.vinteddu_android.ApiConfig.RetrofitClient
+import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
+import it.unical.gciaoo.vinteddu_android.model.User
+import it.unical.gciaoo.vinteddu_android.model.Utente
 import it.unical.gciaoo.vinteddu_android.ui.theme.VintedduAndroidTheme
 import it.unical.gciaoo.vinteddu_android.viewmodels.AddressFormViewModel
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserFormViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
+import it.unical.gciaoo.vinteddu_android.viewmodels.UserViewModel
+import retrofit2.Response
 
 
 class MainActivity : ComponentActivity() {
-    private lateinit var sessionManager: SessionManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             VintedduAndroidTheme {
                 // A surface container using the 'background' color from the theme
@@ -107,7 +102,10 @@ fun NavigationView(navHostController: NavHostController) {
         composable(Routes.PROFILE.route) {
             val context = LocalContext.current
             val sessionManager = remember { SessionManager(context) }
-            Profile(userFormViewModel = UserFormViewModel(), apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
+            val userViewModel = UserViewModel()
+            val user = remember{User.Companion}
+
+            Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
         }
 
     }
@@ -234,9 +232,3 @@ fun Drawer(
     }
 }
 
-fun getUsernameFromToken(token: String?): String? {
-//    val claims: Claims = Jwts.parser().parseClaimsJwt(token).body
-//    return claims.subject
-    val claims: Claims = Jwts.parser().parseClaimsJws(token).body
-    return claims.subject
-}

@@ -1,15 +1,10 @@
 package it.unical.gciaoo.vinteddu_android.viewmodels
 
 import android.content.Context
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.currentCompositionLocalContext
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
-import it.unical.gciaoo.vinteddu_android.ApiService
-import it.unical.gciaoo.vinteddu_android.RetrofitClient
-import it.unical.gciaoo.vinteddu_android.SessionManager
+import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
+import it.unical.gciaoo.vinteddu_android.ApiConfig.RetrofitClient
+import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
 import it.unical.gciaoo.vinteddu_android.model.Item
 
 class ItemViewModel(private val localContext: Context) : ViewModel() {
