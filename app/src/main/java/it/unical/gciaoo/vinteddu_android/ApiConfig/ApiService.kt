@@ -3,6 +3,7 @@ import it.unical.gciaoo.vinteddu_android.model.Item
 import it.unical.gciaoo.vinteddu_android.model.User
 import it.unical.gciaoo.vinteddu_android.model.Utente
 import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
+import it.unical.gciaoo.vinteddu_android.model.Wallet
 import retrofit2.http.GET
 import retrofit2.Response
 import retrofit2.http.Field
@@ -17,6 +18,8 @@ interface ApiService {
     @GET("/api/v2/user/{token}")
     suspend fun getCurrentUser(@Header("Authorization") token:String?, @Path("token") token_: String?) : Response<UtenteDTO>
 
+    @GET("/api/v2/wallet/{userId}")
+    suspend fun getSaldo(@Header("Authorization") token:String?, @Path("userId") id: Long?) : Response<Wallet>
 
     @GET("/api/v1/{userId}/Account")
     suspend fun getAccount(@Path("userId") userId: String): Response<User>

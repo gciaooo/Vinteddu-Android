@@ -18,6 +18,7 @@ import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
 import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
 import it.unical.gciaoo.vinteddu_android.model.Utente
 import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
+import it.unical.gciaoo.vinteddu_android.model.Wallet
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserViewModel
 import retrofit2.Response
 import java.lang.Thread.sleep
@@ -30,13 +31,17 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
     val errorMessageState = remember { mutableStateOf("") }
     val token = sessionManager.getToken();
     val userDto = remember { mutableStateOf<UtenteDTO?>(null) }
-
+    val wallet = remember { mutableStateOf<Wallet?>(null) }
     LaunchedEffect(key1 = token, key2 = userDto.value) {
         // Effettua la chiamata API per ottenere UtenteDTO
         val response = apiService.getCurrentUser("Bearer $token", token)
         sleep(2)
         if (response.isSuccessful) {
             userDto.value = response.body()
+            val response_2 = apiService.getSaldo("Bearer $token", userDto.value?.id)
+            if(response_2.isSuccessful) {
+                wallet.value = response_2.body()
+            }
             updateProfile(userDto.value, userViewModel)// Aggiorna userState nel ViewModel
         } else {
             errorMessageState.value = "Errore durante la richiesta dell'utente"
@@ -66,6 +71,12 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
 
             Text(
                 text = "Cognome: ${userDto.value?.cognome}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            Text(
+                text = "Saldo: ${wallet.value?.saldo}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp)
             )
