@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,15 +40,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-<<<<<<< HEAD
-=======
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
->>>>>>> 9f0f1b7fa95a1affebd4e91c5a2930c4123e48f9
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,11 +53,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-<<<<<<< HEAD
-=======
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
->>>>>>> 9f0f1b7fa95a1affebd4e91c5a2930c4123e48f9
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
@@ -123,18 +119,18 @@ fun NavigationView(setFabState: (Boolean) -> Unit, navHostController: NavHostCon
             setFabState(false)
             val context = LocalContext.current
             val sessionManager = remember { SessionManager(context) }
-<<<<<<< HEAD
+
             val userViewModel = UserViewModel()
             val user = remember{User.Companion}
 
             Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
-=======
-            Profile(
-                userFormViewModel = UserFormViewModel(),
-                apiService = RetrofitClient.create(sessionManager),
-                sessionManager = sessionManager
-            )
->>>>>>> 9f0f1b7fa95a1affebd4e91c5a2930c4123e48f9
+
+//            Profile(
+//                userFormViewModel = UserFormViewModel(),
+//                apiService = RetrofitClient.create(sessionManager),
+//                sessionManager = sessionManager
+//            )
+
         }
 //        composable(Routes.SEARCH.route) {
 //            SearchPage()

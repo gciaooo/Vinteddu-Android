@@ -20,6 +20,7 @@ import it.unical.gciaoo.vinteddu_android.model.Utente
 import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserViewModel
 import retrofit2.Response
+import java.lang.Thread.sleep
 
 @Composable
 fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager: SessionManager
@@ -29,10 +30,11 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
     val errorMessageState = remember { mutableStateOf("") }
     val token = sessionManager.getToken();
     val userDto = remember { mutableStateOf<UtenteDTO?>(null) }
-    LaunchedEffect(key1 = token) {
-        // Effettua la chiamata API per ottenere UtenteDTO
 
+    LaunchedEffect(key1 = token, key2 = userDto.value) {
+        // Effettua la chiamata API per ottenere UtenteDTO
         val response = apiService.getCurrentUser("Bearer $token", token)
+        sleep(2)
         if (response.isSuccessful) {
             userDto.value = response.body()
             updateProfile(userDto.value, userViewModel)// Aggiorna userState nel ViewModel
@@ -41,33 +43,61 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
         }
     }
 
+    if (userDto.value != null) {
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
 
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
-        userDto.value?.let { user ->
             Text(
-                text = "Username: ${user.username}",
+            text = "Username: ${userDto.value?.username}",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(16.dp)
+            )
+
+            Text(
+                text = "Email: ${userDto.value?.email}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp)
             )
 
             Text(
-                text = "Email: ${user.email}",
+                text = "Nome: ${userDto.value?.nome}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp)
             )
 
             Text(
-                text = "Nome: ${user.nome}",
+                text = "Cognome: ${userDto.value?.cognome}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp)
             )
 
-            Text(
-                text = "Cognome: ${user.cognome}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp)
-            )
         }
+
+//    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+//
+//        Text(
+//            text = "Username: ${userDto.value?.username}",
+//            style = MaterialTheme.typography.bodyMedium,
+//            modifier = Modifier.padding(16.dp)
+//        )
+//
+//        Text(
+//            text = "Email: ${userDto.value?.email}",
+//            style = MaterialTheme.typography.bodyMedium,
+//            modifier = Modifier.padding(16.dp)
+//        )
+//
+//        Text(
+//            text = "Nome: ${userDto.value?.nome}",
+//            style = MaterialTheme.typography.bodyMedium,
+//            modifier = Modifier.padding(16.dp)
+//        )
+//
+//        Text(
+//            text = "Cognome: ${userDto.value?.cognome}",
+//            style = MaterialTheme.typography.bodyMedium,
+//            modifier = Modifier.padding(16.dp)
+//        )
+//
     }
 }
 
