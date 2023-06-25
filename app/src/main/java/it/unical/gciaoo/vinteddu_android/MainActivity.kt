@@ -115,22 +115,24 @@ fun NavigationView(setFabState: (Boolean) -> Unit, navHostController: NavHostCon
                 addressFormViewModel = AddressFormViewModel()
             )
         }
+//        composable(Routes.ITEM.route) {
+//            setFabState(false)
+//            val context = LocalContext.current
+//            val sessionManager = remember { SessionManager(context) }
+//
+//            val userViewModel = UserViewModel()
+//
+//            ItemPage(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
+//        }
         composable(Routes.PROFILE.route) {
             setFabState(false)
             val context = LocalContext.current
             val sessionManager = remember { SessionManager(context) }
 
             val userViewModel = UserViewModel()
-            val user = remember{User.Companion}
+            //ItemPage(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
 
             Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
-
-//            Profile(
-//                userFormViewModel = UserFormViewModel(),
-//                apiService = RetrofitClient.create(sessionManager),
-//                sessionManager = sessionManager
-//            )
-
         }
 //        composable(Routes.SEARCH.route) {
 //            SearchPage()

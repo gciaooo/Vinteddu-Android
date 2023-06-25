@@ -21,8 +21,6 @@ interface ApiService {
     @GET("/api/v2/wallet/{userId}")
     suspend fun getSaldo(@Header("Authorization") token:String?, @Path("userId") id: Long?) : Response<Wallet>
 
-    @GET("/api/v1/{userId}/Account")
-    suspend fun getAccount(@Path("userId") userId: String): Response<User>
     @FormUrlEncoded
     @POST("/api/v1/authenticate")
     suspend fun authenticate(
@@ -30,6 +28,8 @@ interface ApiService {
         @Field("password") password: String
     ): Response<Unit>
 
-    @GET("/api/v3/item/{itemId}") //TODO: add api path
+    @GET("/api/v3/item/{itemId}")
     suspend fun getItem(@Header("Authorization") token:String?, @Path("itemId") itemId: Long): Response<Item>
+
+
 }

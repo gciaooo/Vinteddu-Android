@@ -13,11 +13,12 @@ enum class Status {
 }
 
 class Item(
-    val id: Long,
+    val id: Long?,
     val name: String,
-    val description: String = "",
+    val description: String,
     val price: BigDecimal,
-    val creationDate: LocalDate,
-    val status: Status,
+    val creationDate: String,
+    val status: String,
+    val seller : UtenteDTO,
     val images: List<Bitmap>
 )

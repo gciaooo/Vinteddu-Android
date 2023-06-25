@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
+import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
 import it.unical.gciaoo.vinteddu_android.ui.theme.Typography
 import it.unical.gciaoo.vinteddu_android.viewmodels.AddressFormViewModel
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserFormViewModel
@@ -81,6 +82,7 @@ fun Login(navHostController: NavHostController, apiService: ApiService) {
                         val response = apiService.authenticate(username, password)
                         if(response.isSuccessful){
                             navHostController.navigate(Routes.PROFILE.route)
+                            //navHostController.navigate(ItemPage(apiService = apiService, sessionManager = SessionManager()))
                         }
 
                     } catch (e: Exception) {
