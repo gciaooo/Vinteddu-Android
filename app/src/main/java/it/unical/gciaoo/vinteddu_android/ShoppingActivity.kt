@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -32,6 +33,7 @@ import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
 import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
 import it.unical.gciaoo.vinteddu_android.model.Item
 import it.unical.gciaoo.vinteddu_android.ui.theme.Typography
+import okhttp3.internal.wait
 import java.lang.Thread.sleep
 
 
@@ -44,28 +46,33 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager) {
     val imagesState = rememberLazyListState()
 
     val token = sessionManager.getToken();
+
     val item = remember { mutableStateOf<Item?>(null) }
 
-    LaunchedEffect(key1 = token, key2 = item.value){
-        val response = apiService.getItem("Bearer $token", 2)
-        sleep(2)
+
+    LaunchedEffect(key1 = token/*, key2 = item.value*/){
+        val response = apiService.getItem("Bearer $token", 1)
+        sleep(20)
         if(response.isSuccessful){
             item.value = response.body()
         }
     }
 
+
+
+
     if(item.value!=null){
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top, modifier = Modifier.padding(horizontal = 20.dp)) {
-            Text(item.value!!.name, style = Typography.headlineLarge, modifier = Modifier.align(Alignment.Start))
+            Text(item.value!!.nome, style = Typography.headlineLarge, modifier = Modifier.align(Alignment.Start))
 
             LazyRow(state = imagesState, modifier = Modifier.padding(30.dp)) {
-                items(item.value!!.images) {
-                    Box(modifier = Modifier.height(100.dp)) {
-                        Image(bitmap = it.asImageBitmap(), contentDescription = stringResource(R.string.item_image))
-                    }
-                }
+//                items(item.value!!.images) {
+//                    Box(modifier = Modifier.height(100.dp)) {
+//                        Image(bitmap = it.asImageBitmap(), contentDescription = stringResource(R.string.item_image))
+//                    }
+//                }
             }
-            Text(item.value!!.price.toPlainString(), style = Typography.titleLarge)
+           // Text(item.value!!.price.toPlainString(), style = Typography.titleLarge)
             Button(onClick = { /*TODO*/ }, modifier = buttonModifier) {
                 Text(stringResource(id = R.string.add_to_cart))
                 Icon(
@@ -83,10 +90,15 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager) {
             Spacer(modifier = Modifier.padding(10.dp))
             Text(stringResource(R.string.description), style = Typography.titleSmall, modifier = Modifier.align(Alignment.Start))
             Divider(modifier = dividerModifier)
-            Text(item.value!!.description, style = Typography.bodySmall)
+            Text(item.value!!.descrizione, style = Typography.bodySmall)
             Divider(modifier = dividerModifier)
         }
 
     }
+    else{
+        sleep(1000)
+    }
 
 }
+
+

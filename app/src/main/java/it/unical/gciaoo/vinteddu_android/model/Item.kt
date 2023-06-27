@@ -12,13 +12,22 @@ enum class Status {
     ABORTED
 }
 
-class Item(
+data class Item(
+//    val id: Long?,
+//    val name: String,
+//    val description: String,
+//    val price: BigDecimal,
+//    val creationDate: List<Int>,
+//    val status: String,
+//    //val seller : UtenteDTO,
+//    val images: /*List<Bitmap>*/ String
+
     val id: Long?,
-    val name: String,
-    val description: String,
-    val price: BigDecimal,
-    val creationDate: String,
-    val status: String,
-    val seller : UtenteDTO,
-    val images: List<Bitmap>
+    val nome: String,
+    val descrizione: String,
+    val prezzo: BigDecimal,
+    val dataCreazione: List<Int>,
+    val stato: String,
+    val idUtente : Long,
+    val immagini: /*List<Bitmap>*/ String
 )
