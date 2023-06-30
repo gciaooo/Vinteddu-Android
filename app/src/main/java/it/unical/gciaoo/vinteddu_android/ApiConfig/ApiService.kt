@@ -11,6 +11,7 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import java.time.LocalDate
 
 interface ApiService {
 
@@ -28,8 +29,26 @@ interface ApiService {
         @Field("password") password: String
     ): Response<Unit>
 
+    @FormUrlEncoded
+    @POST("/api/v1/register")
+    suspend fun register(
+        @Field("username") username: String,
+        @Field("password") password: String,
+        @Field("email") email: String,
+        @Field("nome") nome: String,
+        @Field("cognome") cognome: String,
+        @Field("datanascita") datanascita: LocalDate,
+        @Field("indirizzo") indirizzo: String,
+        @Field("numerotelefono") numerotelefono: String,
+    ): Response<String>
+
     @GET("/api/v3/item/{itemId}")
     suspend fun getItem(@Header("Authorization") token:String?, @Path("itemId") itemId: Long): Response<Item>
 
+    @GET("/api/v3/search/{nome}")
+    suspend fun getSearch(@Header("Authorization") token:String?, @Path("nome") nome: String): Response<List<Item>>
+
+    @GET("/api/v2/Favorites/{userId}")
+    suspend fun getFavorites(@Header("Authorization") token:String?, @Path("userId") userId: Long): Response<List<Item>>
 
 }

@@ -103,7 +103,8 @@ fun Login(navHostController: NavHostController, apiService: ApiService) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: AddressFormViewModel) {
+fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: AddressFormViewModel, navHostController: NavHostController, apiService: ApiService) {
+    val coroutineScope = rememberCoroutineScope()
     val userState by userFormViewModel.userState.collectAsState()
     val nameEmailError by remember { derivedStateOf { userState.isUsernameError || userState.isEmailError } }
     val addressState by addressFormViewModel.addressState.collectAsState()
@@ -284,6 +285,28 @@ fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: Address
                         .padding(vertical = 30.dp)
                         .height(IntrinsicSize.Max),
                     onClick = {
+                        val username = userState.username
+                        val password = userState.password
+                        val email = userState.email
+                        val nome = userState.lastName
+                        val cognome = userState.firstName
+                        val telefono = userState.phoneNumber
+                        val dataNascita = userState.birthDate
+                        val indirizzo = addressState.street+" "+addressState.city+" "+addressState.province+" "+addressState.country
+
+                        coroutineScope.launch {
+                            try {
+                                val response = apiService.register(username, password, email, nome, cognome, dataNascita, indirizzo, telefono )
+                                if(response.isSuccessful){
+                                    navHostController.navigate(Routes.LOGIN.route)
+                                    //navHostController.navigate(ItemPage(apiService = apiService, sessionManager = SessionManager()))
+                                }
+
+                            } catch (e: Exception) {
+                                // Si è verificato un errore durante la chiamata API
+                            }
+                        }
+
 
                     }
                 )
