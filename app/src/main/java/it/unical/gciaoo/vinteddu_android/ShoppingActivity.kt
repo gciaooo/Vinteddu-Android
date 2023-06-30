@@ -1,24 +1,30 @@
 package it.unical.gciaoo.vinteddu_android
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,16 +32,77 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
 import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
 import it.unical.gciaoo.vinteddu_android.model.Item
 import it.unical.gciaoo.vinteddu_android.ui.theme.Typography
-import okhttp3.internal.wait
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.semantics.isContainer
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.lang.Thread.sleep
 
+@ExperimentalMaterial3Api
+@Composable
+fun SearchBar(apiService: ApiService, sessionManager: SessionManager) {
+    val coroutineScope = rememberCoroutineScope()
+    var text by rememberSaveable { mutableStateOf("") }
+    var active by rememberSaveable { mutableStateOf(false) }
+//    var searches = remember { mutableListOf<Item>() }
+    Box(Modifier.fillMaxSize()) {
+        Box(
+            Modifier
+                .semantics {
+                    @Suppress("DEPRECATION")
+                    isContainer = true
+                }
+                .zIndex(1f)
+                .fillMaxWidth()) {
+            SearchBar(
+                modifier = Modifier.align(Alignment.TopCenter),
+                query = text,
+                onQueryChange = { text = it },
+                onSearch = {
+//                    coroutineScope.launch {
+//                        val res = apiService.search("Bearer ${sessionManager.getToken()}", text)
+//                        searches = res.body()
+//                    }
+                },
+                active = active,
+                onActiveChange = {
+                    active = it
+                },
+                placeholder = { Text(stringResource(R.string.search_bar_placeholder)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
+            ) {
+//                LazyColumn(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    contentPadding = PaddingValues(16.dp),
+//                    verticalArrangement = Arrangement.spacedBy(4.dp)
+//                ) {
+//                    items(searches) { idx ->
+//                        val resultText = "Suggestion $idx"
+//                        ListItem(
+//                            headlineContent = { Text(resultText) },
+//                            supportingContent = { Text("Additional info") },
+//                            leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
+//                            modifier = Modifier.clickable {
+//                                text = resultText
+//                                active = false
+//                            }
+//                        )
+//                    }
+//                }
+            }
+        }
+    }
+}
 
 @Composable
 fun ItemPage(apiService: ApiService, sessionManager: SessionManager) {
@@ -74,10 +141,10 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager) {
             }
            // Text(item.value!!.price.toPlainString(), style = Typography.titleLarge)
             Button(onClick = { /*TODO*/ }, modifier = buttonModifier) {
-                Text(stringResource(id = R.string.add_to_cart))
+                Text(stringResource(id = R.string.purchase))
                 Icon(
                     imageVector = Icons.Filled.ShoppingCart,
-                    contentDescription = stringResource(R.string.add_to_cart_icon)
+                    contentDescription = stringResource(R.string.purchase_icon)
                 )
             }
             FilledTonalButton(onClick = { /*TODO*/ }, modifier = buttonModifier) {
@@ -100,5 +167,3 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager) {
     }
 
 }
-
-

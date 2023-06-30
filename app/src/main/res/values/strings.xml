@@ -26,8 +26,8 @@
     <string name="profile">Profile</string>
     <string name="home">Home</string>
     <string name="user_page">User page</string>
-    <string name="add_to_cart">Add to cart</string>
-    <string name="add_to_cart_icon">Add to cart icon</string>
+    <string name="purchase">Proceed to purchase</string>
+    <string name="purchase_icon">Purchase icon</string>
     <string name="add_to_wishlist">Add to wishlist</string>
     <string name="add_to_wishlist_icon">Add to wishlist icon</string>
     <string name="description">Description of the product</string>
@@ -37,4 +37,6 @@
     <string name="welcome_title">Welcome to Vinteddu</string>
     <string name="welcome_subtitle">"The 2nd best app to buy and sell used products "</string>
     <string name="search">Search product</string>
+    <string name="search_bar_placeholder">Search your product here.</string>
+    <string name="search_bar_icon">Search Bar icon</string>
 </resources>

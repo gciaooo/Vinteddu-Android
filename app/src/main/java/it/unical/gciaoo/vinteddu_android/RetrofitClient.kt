@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitClient {
     companion object {
-        private const val BASE_URL = "http://160.97.136.116:8080" // Mettere l'indirizzo ip del pc tra // e :
+        private const val BASE_URL = "http://:8080" // Mettere l'indirizzo ip del pc tra // e :
 
         fun create(sessionManager: SessionManager): ApiService {
             val interceptor = AuthInterceptor(sessionManager)
