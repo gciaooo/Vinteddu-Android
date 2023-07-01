@@ -1,7 +1,6 @@
 package it.unical.gciaoo.vinteddu_android
 
 import android.os.Bundle
-import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
@@ -24,8 +22,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,12 +36,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -63,15 +55,12 @@ import androidx.navigation.compose.rememberNavController
 import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
 import it.unical.gciaoo.vinteddu_android.ApiConfig.RetrofitClient
 import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
-import it.unical.gciaoo.vinteddu_android.model.User
-import it.unical.gciaoo.vinteddu_android.model.Utente
 import it.unical.gciaoo.vinteddu_android.ui.theme.VintedduAndroidTheme
 import it.unical.gciaoo.vinteddu_android.viewmodels.AddressFormViewModel
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserFormViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserViewModel
-import retrofit2.Response
 
 
 class MainActivity : ComponentActivity() {
@@ -93,17 +82,13 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun NavigationView(setFabState: (Boolean) -> Unit, navHostController: NavHostController) {
+fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHostController: NavHostController) {
     NavHost(navController = navHostController, startDestination = Routes.HOME.route) {
         composable(Routes.HOME.route) {
-            setFabState(true)
             //TODO: Main page
             MainPage()
         }
         composable(Routes.LOGIN.route) {
-            setFabState(false)
-            val context = LocalContext.current
-            val sessionManager = remember { SessionManager(context) }
             Login(
                 navHostController = navHostController,
                 apiService = RetrofitClient.create(sessionManager)
@@ -116,7 +101,6 @@ fun NavigationView(setFabState: (Boolean) -> Unit, navHostController: NavHostCon
             )
         }
 //        composable(Routes.ITEM.route) {
-//            setFabState(false)
 //            val context = LocalContext.current
 //            val sessionManager = remember { SessionManager(context) }
 //
@@ -125,10 +109,6 @@ fun NavigationView(setFabState: (Boolean) -> Unit, navHostController: NavHostCon
 //            ItemPage(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
 //        }
         composable(Routes.PROFILE.route) {
-            setFabState(false)
-            val context = LocalContext.current
-            val sessionManager = remember { SessionManager(context) }
-
             val userViewModel = UserViewModel()
             //ItemPage(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
 
@@ -196,12 +176,17 @@ fun MainPage() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage() {
     val coroutineScope = rememberCoroutineScope()
     val navHostController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val (fabState, setFabState) = remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val sessionManager = remember { SessionManager(context) }
+    val apiService = RetrofitClient.create(sessionManager)
+    var isSearchBarActive by remember { mutableStateOf(false) }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -221,26 +206,14 @@ fun HomePage() {
                     coroutineScope = coroutineScope
                 )
             },
-            floatingActionButton = {
-                if (fabState) {
-                    ExtendedFloatingActionButton(onClick = {
-//                        navHostController.navigate(Routes.SEARCH.route)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = stringResource(R.string.search_button_icon)
-                        )
-                        Text(stringResource(R.string.search_button_text))
-                    }
-                }
-            }
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it), contentAlignment = Alignment.Center
             ) {
-                NavigationView(setFabState = setFabState, navHostController = navHostController)
+                SearchBar(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController)
+                NavigationView(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController)
             }
         }
     }

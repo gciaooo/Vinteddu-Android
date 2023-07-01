@@ -39,4 +39,6 @@
     <string name="search">Search product</string>
     <string name="search_bar_placeholder">Search your product here.</string>
     <string name="search_bar_icon">Search Bar icon</string>
+    <string name="item_preview_icon">Item preview icon</string>
+    <string name="loading_wait">loading…</string>
 </resources>

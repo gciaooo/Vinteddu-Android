@@ -1,5 +1,6 @@
 package it.unical.gciaoo.vinteddu_android
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,12 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -43,13 +44,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.zIndex
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import androidx.navigation.NavHostController
 import java.lang.Thread.sleep
 
 @ExperimentalMaterial3Api
 @Composable
-fun SearchBar(apiService: ApiService, sessionManager: SessionManager) {
+fun SearchBar(
+    apiService: ApiService,
+    sessionManager: SessionManager,
+    navHostController: NavHostController,
+) {
     val coroutineScope = rememberCoroutineScope()
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
@@ -79,26 +83,19 @@ fun SearchBar(apiService: ApiService, sessionManager: SessionManager) {
                 },
                 placeholder = { Text(stringResource(R.string.search_bar_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
             ) {
-//                LazyColumn(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    contentPadding = PaddingValues(16.dp),
-//                    verticalArrangement = Arrangement.spacedBy(4.dp)
-//                ) {
-//                    items(searches) { idx ->
-//                        val resultText = "Suggestion $idx"
-//                        ListItem(
-//                            headlineContent = { Text(resultText) },
-//                            supportingContent = { Text("Additional info") },
-//                            leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
-//                            modifier = Modifier.clickable {
-//                                text = resultText
-//                                active = false
-//                            }
-//                        )
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+//                    val l = listOf("1", "2", "3", "4")
+//                    items(l) { idx ->
+//                        val itemModifier = Modifier.clickable {
+//                        }
+//                        ItemPreview(idx, itemModifier)
 //                    }
-//                }
+                }
             }
         }
     }
@@ -166,4 +163,25 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager) {
         sleep(1000)
     }
 
+}
+
+@Composable
+fun ItemPreview(id: String, modifier: Modifier) {
+    val itemImage by remember { mutableStateOf<Bitmap?>(null)}
+    val itemName by remember { mutableStateOf<String?>(null) }
+    ListItem(
+        headlineContent = {
+            Text(itemName ?: stringResource(R.string.loading_wait))
+        },
+        leadingContent = {
+            val iconName = R.string.item_preview_icon
+            if (itemImage != null) {
+//                Icon(itemImage.asImageBitmap(), contentDescription = stringResource(iconName))
+            }
+            else {
+                Icon(Icons.Outlined.Refresh, contentDescription = stringResource(iconName))
+            }
+        },
+        modifier = modifier
+    )
 }
