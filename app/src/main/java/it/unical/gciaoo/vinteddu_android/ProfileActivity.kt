@@ -151,9 +151,9 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager) {
                     Row(
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        Box(modifier = Modifier.height(100.dp)) {
-
-                        }
+//                        Box(modifier = Modifier.height(100.dp)) {
+//
+//                        }
 
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
