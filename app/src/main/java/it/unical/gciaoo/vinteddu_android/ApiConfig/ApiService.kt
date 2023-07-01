@@ -11,7 +11,9 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import java.time.LocalDate
+import java.time.temporal.TemporalAmount
 
 interface ApiService {
 
@@ -21,6 +23,10 @@ interface ApiService {
 
     @GET("/api/v2/wallet/{userId}")
     suspend fun getSaldo(@Header("Authorization") token:String?, @Path("userId") id: Long?) : Response<Wallet>
+
+    @FormUrlEncoded
+    @POST("/api/v2/Wallet/{userId}")
+    suspend fun wallet_recharge(@Header("Authorization") token:String?,  @Path("userId") id: Long?, @Field("amount") amount: Int?) : Response<String>
 
     @FormUrlEncoded
     @POST("/api/v1/authenticate")

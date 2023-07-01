@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,9 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,6 +29,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -34,7 +40,9 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
@@ -61,10 +69,12 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
     val token = sessionManager.getToken();
     val userDto = remember { mutableStateOf<UtenteDTO?>(null) }
     val wallet = remember { mutableStateOf<Wallet?>(null) }
+    val commonModifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+    val coroutineScope = rememberCoroutineScope()
+    var intFieldValue by remember { mutableStateOf("") }
     LaunchedEffect(key1 = token, key2 = userDto.value) {
         // Effettua la chiamata API per ottenere UtenteDTO
         val response = apiService.getCurrentUser("Bearer $token", token)
-        sleep(2)
         if (response.isSuccessful) {
             userDto.value = response.body()
             val response_2 = apiService.getSaldo("Bearer $token", userDto.value?.id)
@@ -105,13 +115,59 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
             )
 
             Text(
-                text = "Saldo: ${wallet.value?.saldo}",
+                text = "Saldo:$ ${wallet.value?.saldo}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp)
             )
-//click
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 30.dp)
+            ) {
+                Button(
+                    content={
+                            Text("Ricarica wallet")
+                    },
+                    modifier = commonModifier
+                        .fillMaxWidth()
+                        .padding(vertical = 30.dp)
+                        .height(IntrinsicSize.Max),
+                    onClick = {
+                        coroutineScope.launch {
+                            try {
+                                val intValue = intFieldValue.toIntOrNull()
+                                if (intValue != null) {
+                                    val resp = apiService.wallet_recharge("Bearer $token",userDto.value?.id,intValue)
+                                } else {
+                                    // Valore inserito non è un intero valido
+                                }
+                            } catch (e: Exception) {
+                                // Si è verificato un errore durante la chiamata API
+                            }
+                        }
+                    },
+                )
+
+
+                TextField(
+                    value = intFieldValue,
+                    onValueChange = { value ->
+                        intFieldValue = value.takeIf { it.isEmpty() || it.toIntOrNull() != null } ?: intFieldValue
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    label = { Text("Inserisci l'importo della ricarica") },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 16.dp)
+                        .fillMaxWidth()
+                )
+            }
+//clic
         }
 
+    }else{
+        sleep(2000)
     }
 }
 
@@ -167,7 +223,8 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager) {
                                             )
 
                                             if(cambio_page.isSuccessful){
-         //                                       navHostController.navigate()
+                                                //navHostController.navigate()
+
                                             }
                                         }catch (e: Exception){
 
@@ -188,7 +245,7 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager) {
             }
         }
     }else{
-        sleep(2000)
+        sleep(3000)
     }
 }
 
