@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -40,6 +42,7 @@ import it.unical.gciaoo.vinteddu_android.ui.theme.Typography
 import it.unical.gciaoo.vinteddu_android.viewmodels.AddressFormViewModel
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserFormViewModel
 import kotlinx.coroutines.launch
+import java.lang.Thread.sleep
 
 @Composable
 fun Login(navHostController: NavHostController, apiService: ApiService) {
@@ -103,13 +106,16 @@ fun Login(navHostController: NavHostController, apiService: ApiService) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: AddressFormViewModel) {
+fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: AddressFormViewModel, navHostController: NavHostController, apiService: ApiService) {
+    val coroutineScope = rememberCoroutineScope()
     val userState by userFormViewModel.userState.collectAsState()
     val nameEmailError by remember { derivedStateOf { userState.isUsernameError || userState.isEmailError } }
     val addressState by addressFormViewModel.addressState.collectAsState()
     val shippingError by remember { derivedStateOf { userState.isFirstNameError || userState.isLastNameError || addressState.isStreetError || addressState.isStreetNumberError || addressState.isCityError || addressState.isProvinceError || addressState.isZipCodeError || userState.isPhoneNumberError } }
     val passwordError by remember { derivedStateOf { userState.isPasswordError || userState.isPasswordConfirmError } }
     val commonModifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+    val context = LocalContext.current
+    val showDialog = remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -284,13 +290,50 @@ fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: Address
                         .padding(vertical = 30.dp)
                         .height(IntrinsicSize.Max),
                     onClick = {
+                        val username = userState.username
+                        val password = userState.password
+                        val email = userState.email
+                        val nome = userState.lastName
+                        val cognome = userState.firstName
+                        val telefono = userState.phoneNumber
+                        val dataNascita = userState.birthDate
+                        val indirizzo = addressState.street+" "+addressState.city+" "+addressState.province+" "+addressState.country
 
+                        coroutineScope.launch {
+                            try {
+                                showDialog.value = true
+                                val response = apiService.register(username, password, email, nome, cognome, dataNascita, indirizzo, telefono )
+                            } catch (e: Exception) {
+                                // Si è verificato un errore durante la chiamata API
+                            }
+                        }
                     }
                 )
+                if (showDialog.value) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            showDialog.value = false
+                        },
+                        title = {
+                            Text(text = "Utente registrato")
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    navHostController.navigate(Routes.LOGIN.route)
+                                    showDialog.value = false // Chiudi il popup
+                                }
+                            ) {
+                                Text(text = "OK")
+                            }
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
         }
-
     }
+
 }
 
 @Composable

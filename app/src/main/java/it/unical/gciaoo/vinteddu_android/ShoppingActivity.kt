@@ -57,6 +57,8 @@ fun SearchBar(
     val coroutineScope = rememberCoroutineScope()
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+    val token = sessionManager.getToken()
+    val item_= remember { mutableListOf<Item>() }
 //    var searches = remember { mutableListOf<Item>() }
     Box(Modifier.fillMaxSize()) {
         Box(
@@ -72,10 +74,14 @@ fun SearchBar(
                 query = text,
                 onQueryChange = { text = it },
                 onSearch = {
-//                    coroutineScope.launch {
-//                        val res = apiService.search("Bearer ${sessionManager.getToken()}", text)
-//                        searches = res.body()
-//                    }
+                    coroutineScope.launch {
+                        val res = apiService.getSearch("Bearer $token", text)
+                        if(res.isSuccessful){
+                            for(item in res.body()!!){
+                                item_.add(item)
+                            }
+                        }
+                    }
                 },
                 active = active,
                 onActiveChange = {
@@ -109,7 +115,7 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager) {
     val dividerModifier = Modifier.padding(vertical = 10.dp)
     val imagesState = rememberLazyListState()
 
-    val token = sessionManager.getToken();
+    val token = sessionManager.getToken()
 
     val item = remember { mutableStateOf<Item?>(null) }
 
@@ -154,7 +160,7 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager) {
             Spacer(modifier = Modifier.padding(10.dp))
             Text(stringResource(R.string.description), style = Typography.titleSmall, modifier = Modifier.align(Alignment.Start))
             Divider(modifier = dividerModifier)
-            Text(item.value!!.descrizione, style = Typography.bodySmall)
+            item.value!!.descrizione?.let { Text(it, style = Typography.bodySmall) }
             Divider(modifier = dividerModifier)
         }
 

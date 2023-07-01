@@ -24,10 +24,10 @@ data class Item(
 
     val id: Long?,
     val nome: String,
-    val descrizione: String,
+    val descrizione: String?,
     val prezzo: BigDecimal,
-    val dataCreazione: List<Int>,
+    val dataCreazione: List<Int>?,
     val stato: String,
-    val idUtente : Long,
+    val idUtente : Long?,
     val immagini: /*List<Bitmap>*/ String
 )
