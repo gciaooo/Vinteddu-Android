@@ -249,6 +249,84 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager) {
     }
 }
 
+@Composable
+fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManager) {
+    val coroutineScope = rememberCoroutineScope()
+    val token = sessionManager.getToken()
+    val preferiti = remember { mutableListOf<Item>() }
+
+    LaunchedEffect(key1 = token, key2 = preferiti){
+        val response = apiService.getItemInVendita("Bearer $token", 2)
+        if(response.isSuccessful){
+            for(item in response.body()!!){
+                preferiti.add(item)
+            }
+        }
+    }
+
+    if(preferiti.isNotEmpty()) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+
+        ) {
+            Text(
+                text = "Preferiti",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(16.dp)
+            )
+
+
+            for (prodotto in preferiti) {
+                Card(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .fillMaxWidth(),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+//                        Box(modifier = Modifier.height(100.dp)) {
+//
+//                        }
+
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            ClickableText(
+                                text = AnnotatedString(prodotto.nome),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        try{
+                                            val cambio_page= apiService.getItem(token,
+                                                prodotto.id!!
+                                            )
+
+                                            if(cambio_page.isSuccessful){
+                                                //navHostController.navigate()
+
+                                            }
+                                        }catch (e: Exception){
+
+                                        }
+                                    }
+
+
+                                },
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Prezzo: ${formattaPrezzo(prodotto.prezzo)}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }else{
+        sleep(3000)
+    }
+}
+
 
 fun formattaPrezzo(prezzo: BigDecimal): String {
     val formatter = NumberFormat.getCurrencyInstance()

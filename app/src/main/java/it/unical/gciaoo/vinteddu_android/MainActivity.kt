@@ -86,18 +86,27 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
     NavHost(navController = navHostController, startDestination = Routes.HOME.route) {
         composable(Routes.HOME.route) {
             //TODO: Main page
-            MainPage()
+
+            val context = LocalContext.current
+            val sessionManager = remember { SessionManager(context) }
+            MainPage(apiService = RetrofitClient.create(sessionManager),
+                sessionManager = sessionManager)
         }
         composable(Routes.LOGIN.route) {
             Login(
                 navHostController = navHostController,
-                apiService = RetrofitClient.create(sessionManager)
+                apiService = RetrofitClient.create(sessionManager),
+                sessionManager = sessionManager
             )
         }
         composable(Routes.REGISTER.route) {
+            val context = LocalContext.current
+            val sessionManager = remember { SessionManager(context) }
             Register(
                 userFormViewModel = UserFormViewModel(),
-                addressFormViewModel = AddressFormViewModel()
+                addressFormViewModel = AddressFormViewModel(),
+                apiService = RetrofitClient.create(sessionManager),
+                navHostController = navHostController,
             )
         }
 //        composable(Routes.ITEM.route) {
@@ -110,9 +119,9 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
 //        }
         composable(Routes.PROFILE.route) {
             val userViewModel = UserViewModel()
-            //ItemPage(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
+            PaginaPreferiti(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
 
-            Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
+            //Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
         }
 //        composable(Routes.SEARCH.route) {
 //            SearchPage()
@@ -152,14 +161,27 @@ fun VintedduTopAppBar(
     )
 }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
-fun MainPage() {
+fun MainPage(apiService: ApiService, sessionManager: SessionManager) {
+
+    val token=sessionManager.getToken()
+    LaunchedEffect(key1 = token){
+        val response = apiService.getCurrentUser("Bearer $token", token)
+        if(response.isSuccessful){
+            sessionManager.saveId(response.body()!!.id)
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top,
-        modifier = Modifier.padding(horizontal = 30.dp).fillMaxHeight()
+        modifier = Modifier
+            .padding(horizontal = 30.dp)
+            .fillMaxHeight()
     ) {
-        val textModifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        val textModifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
         Spacer(Modifier.padding(vertical = 60.dp))
         Text(
             text = stringResource(R.string.welcome_title),

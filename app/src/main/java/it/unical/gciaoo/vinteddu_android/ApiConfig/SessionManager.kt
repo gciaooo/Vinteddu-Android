@@ -12,11 +12,27 @@ class SessionManager(context: Context) {
 
     private val secretKey=  "23778sah9021-12123-12s-as-12a-AS_12xoiJN-SHWQ98";
 
-    fun saveUsername(username: String) {
+    fun saveUsername(username : String) {
         editor.putString("Username", username)
         editor.apply()
     }
 
+    fun saveId(id : Long) {
+        editor.putLong("Id", id)
+        editor.apply()
+    }
+
+    fun getUsername() : String? {
+        val id = sharedPreferences.getString("Username", null)
+
+        return id;
+    }
+
+    fun getId() : Long {
+        val id = sharedPreferences.getLong("Id", 0)
+
+        return id;
+    }
 
 
     fun clearUsername() {

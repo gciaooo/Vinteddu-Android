@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 import java.lang.Thread.sleep
 
 @Composable
-fun Login(navHostController: NavHostController, apiService: ApiService) {
+fun Login(navHostController: NavHostController, apiService: ApiService, sessionManager: SessionManager) {
     val commonModifier = Modifier
         .fillMaxWidth()
         .padding(20.dp)
@@ -84,7 +84,8 @@ fun Login(navHostController: NavHostController, apiService: ApiService) {
                     try {
                         val response = apiService.authenticate(username, password)
                         if(response.isSuccessful){
-                            navHostController.navigate(Routes.PROFILE.route)
+                            sessionManager.saveUsername(username)
+                            navHostController.navigate(Routes.HOME.route)
                             //navHostController.navigate(ItemPage(apiService = apiService, sessionManager = SessionManager()))
                         }
 

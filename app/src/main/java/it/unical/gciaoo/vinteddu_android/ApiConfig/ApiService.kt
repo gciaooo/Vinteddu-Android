@@ -57,4 +57,7 @@ interface ApiService {
     @GET("/api/v2/Favorites/{userId}")
     suspend fun getFavorites(@Header("Authorization") token:String?, @Path("userId") userId: Long): Response<List<Item>>
 
+    @GET("/api/v2/inVendits/{userId}")
+    suspend fun getItemInVendita(@Header("Authorization") token:String?, @Path("userId") userId: Long): Response<List<Item>>
+
 }
