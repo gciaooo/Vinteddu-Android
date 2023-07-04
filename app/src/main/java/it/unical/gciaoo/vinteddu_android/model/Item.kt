@@ -1,8 +1,6 @@
 package it.unical.gciaoo.vinteddu_android.model
 
-import android.graphics.Bitmap
 import java.math.BigDecimal
-import java.time.LocalDate
 
 
 enum class Status {
@@ -23,11 +21,11 @@ data class Item(
 //    val images: /*List<Bitmap>*/ String
 
     val id: Long?,
-    val nome: String,
-    val descrizione: String?,
-    val prezzo: BigDecimal,
+    var nome: String,
+    var descrizione: String?,
+    var prezzo: BigDecimal?,
     val dataCreazione: List<Int>?,
     val stato: String,
-    val idUtente : Long?,
-    val immagini: /*List<Bitmap>*/ String
+    val idUtente: Long?,
+    var immagini: /*List<Bitmap>*/ String
 )

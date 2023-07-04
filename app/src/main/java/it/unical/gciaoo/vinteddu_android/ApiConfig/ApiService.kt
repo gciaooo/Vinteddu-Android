@@ -6,12 +6,14 @@ import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
 import it.unical.gciaoo.vinteddu_android.model.Wallet
 import retrofit2.http.GET
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.temporal.TemporalAmount
 
@@ -57,7 +59,18 @@ interface ApiService {
     @GET("/api/v2/Favorites/{userId}")
     suspend fun getFavorites(@Header("Authorization") token:String?, @Path("userId") userId: Long): Response<List<Item>>
 
-    @GET("/api/v2/inVendits/{userId}")
+    @GET("/api/v2/inVendita/{userId}")
     suspend fun getItemInVendita(@Header("Authorization") token:String?, @Path("userId") userId: Long): Response<List<Item>>
 
+
+    @FormUrlEncoded
+    @POST("/api/v3/add/{token}")
+    suspend fun addItem(
+        @Header("Authorization") token:String?,
+        @Path("token") token_: String?,
+        @Field("nome") nome: String,
+        @Field("descrizione") descrizione: String,
+        @Field("prezzo") prezzo: BigDecimal,
+        @Field("immagine") immagine : String
+    ): Response<String>
 }
