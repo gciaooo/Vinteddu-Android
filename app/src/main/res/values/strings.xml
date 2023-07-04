@@ -41,4 +41,8 @@
     <string name="search_bar_icon">Search Bar icon</string>
     <string name="item_preview_icon">Item preview icon</string>
     <string name="loading_wait">loading…</string>
+    <string name="lost_password">Password recovery</string>
+    <string name="lost_password_prompt">Recover password</string>
+    <string name="lost_password_button">Send recovery code</string>
+    <string name="lost_password_subtitle">We\'ll send a recovery code to your email address</string>
 </resources>

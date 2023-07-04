@@ -45,6 +45,7 @@ import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import java.lang.Thread.sleep
 
 @ExperimentalMaterial3Api
@@ -53,6 +54,7 @@ fun SearchBar(
     apiService: ApiService,
     sessionManager: SessionManager,
     navHostController: NavHostController,
+    isSearchBarActive: MutableState<Boolean>,
 ) {
     val coroutineScope = rememberCoroutineScope()
     var text by rememberSaveable { mutableStateOf("") }
@@ -85,22 +87,29 @@ fun SearchBar(
                 },
                 active = active,
                 onActiveChange = {
+                    if (it) {
+
+                    }
+                    else {
+
+                    }
                     active = it
                 },
                 placeholder = { Text(stringResource(R.string.search_bar_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             ) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().clickable {
+                                                                 active = false
+                    },
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-//                    val l = listOf("1", "2", "3", "4")
-//                    items(l) { idx ->
-//                        val itemModifier = Modifier.clickable {
-//                        }
-//                        ItemPreview(idx, itemModifier)
-//                    }
+                    items(item_) { item ->
+                        val itemModifier = Modifier.clickable {
+                        }
+                        ItemPreview(item.id.toString(), itemModifier)
+                    }
                 }
             }
         }
@@ -108,7 +117,7 @@ fun SearchBar(
 }
 
 @Composable
-fun ItemPage(apiService: ApiService, sessionManager: SessionManager) {
+fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Long) {
     val buttonModifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 10.dp, vertical = 4.dp)

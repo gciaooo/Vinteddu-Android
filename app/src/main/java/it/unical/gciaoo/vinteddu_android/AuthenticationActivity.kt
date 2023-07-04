@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -42,7 +43,6 @@ import it.unical.gciaoo.vinteddu_android.ui.theme.Typography
 import it.unical.gciaoo.vinteddu_android.viewmodels.AddressFormViewModel
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserFormViewModel
 import kotlinx.coroutines.launch
-import java.lang.Thread.sleep
 
 @Composable
 fun Login(navHostController: NavHostController, apiService: ApiService, sessionManager: SessionManager) {
@@ -69,12 +69,18 @@ fun Login(navHostController: NavHostController, apiService: ApiService, sessionM
         Spacer(modifier = Modifier.weight(0.2f))
         InputField(name = stringResource(R.string.login_username), commonModifier, usernameState)
         InputField(name = stringResource(R.string.login_password), commonModifier, passwordState)
+        Text(stringResource(R.string.lost_password_prompt), modifier = Modifier
+            .clickable {
+                navHostController.navigate(Routes.LOSTPASSWORD.route)
+            }
+            .align(Alignment.Start)
+            .padding(horizontal = 20.dp)
+        )
         Button(content = {
             Text(stringResource(R.string.login))
-
         },
             modifier = commonModifier
-                .padding(vertical = 30.dp)
+                .padding(vertical = 20.dp)
                 .height(IntrinsicSize.Max),
             onClick = {
                 val username = usernameState.value
@@ -95,17 +101,16 @@ fun Login(navHostController: NavHostController, apiService: ApiService, sessionM
                 }
             }
         )
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            stringResource(R.string.register_prompt),
-            modifier = Modifier
-                .padding(vertical = 15.dp)
-                .clickable(onClick = { navHostController.navigate("login/new") })
+        FilledTonalButton(
+            onClick = { navHostController.navigate("login/new") },
+            content = { Text(stringResource(R.string.register_prompt)) },
+            modifier = commonModifier
+                .padding(vertical = 5.dp)
         )
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: AddressFormViewModel, navHostController: NavHostController, apiService: ApiService) {
     val coroutineScope = rememberCoroutineScope()
@@ -338,16 +343,59 @@ fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: Address
 }
 
 @Composable
-fun InputField(name: String, modifier: Modifier, usernameState: MutableState<String>) {
+fun InputField(name: String, modifier: Modifier, fieldState: MutableState<String>) {
     //var field by remember { mutableStateOf("") }
     Row(horizontalArrangement = Arrangement.Center) {
         TextField(
-            value = usernameState.value,
+            value = fieldState.value,
             onValueChange = { newValue ->
-                usernameState.value = newValue },
+                fieldState.value = newValue },
             label = { Text(name) },
             singleLine = true,
             modifier = modifier.padding(vertical = 5.dp)
         )
+    }
+}
+
+@Composable
+fun PasswordLostPage() {
+    val commonModifier = Modifier
+        .fillMaxWidth()
+        .padding(20.dp)
+
+    val emailState = remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier.padding(all = 5.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.weight(0.1f))
+        Text(
+            text = stringResource(R.string.lost_password), style = Typography.headlineLarge,
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(horizontal = 20.dp)
+                .weight(0.3f)
+        )
+        Text(
+            text = stringResource(R.string.lost_password_subtitle),
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(horizontal = 20.dp)
+                .weight(0.2f)
+        )
+        InputField(name = stringResource(R.string.user_email), modifier = commonModifier, fieldState = emailState)
+        Spacer(modifier = Modifier.weight(0.2f))
+        Button(content = {
+            Text(stringResource(R.string.lost_password_button))
+        },
+            modifier = commonModifier
+                .padding(vertical = 30.dp)
+                .height(IntrinsicSize.Max),
+            onClick = {
+
+            }
+        )
+        Spacer(modifier = Modifier.weight(1f))
     }
 }

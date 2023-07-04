@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,8 +51,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
 import it.unical.gciaoo.vinteddu_android.ApiConfig.RetrofitClient
 import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
@@ -86,37 +89,31 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
     NavHost(navController = navHostController, startDestination = Routes.HOME.route) {
         composable(Routes.HOME.route) {
             //TODO: Main page
-
-            val context = LocalContext.current
-            val sessionManager = remember { SessionManager(context) }
-            MainPage(apiService = RetrofitClient.create(sessionManager),
-                sessionManager = sessionManager)
+            MainPage(apiService = apiService, sessionManager = sessionManager)
         }
         composable(Routes.LOGIN.route) {
             Login(
                 navHostController = navHostController,
-                apiService = RetrofitClient.create(sessionManager),
+                apiService = apiService,
                 sessionManager = sessionManager
             )
         }
         composable(Routes.REGISTER.route) {
-            val context = LocalContext.current
-            val sessionManager = remember { SessionManager(context) }
             Register(
                 userFormViewModel = UserFormViewModel(),
                 addressFormViewModel = AddressFormViewModel(),
-                apiService = RetrofitClient.create(sessionManager),
-                navHostController = navHostController,
+                apiService = apiService,
+                navHostController = navHostController
             )
         }
-//        composable(Routes.ITEM.route) {
-//            val context = LocalContext.current
-//            val sessionManager = remember { SessionManager(context) }
-//
-//            val userViewModel = UserViewModel()
-//
-//            ItemPage(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
-//        }
+        composable(Routes.LOSTPASSWORD.route) {
+            PasswordLostPage()
+        }
+        composable(Routes.ITEMS.route, arguments = listOf(navArgument("id") { type = NavType.StringType})) {
+            it.arguments?.getString("id")?.let { id ->
+                ItemPage(apiService = apiService, sessionManager = sessionManager, itemId = id.toLong())
+            }
+        }
         composable(Routes.PROFILE.route) {
             val userViewModel = UserViewModel()
             PaginaPreferiti(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
@@ -207,7 +204,8 @@ fun HomePage() {
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
     val apiService = RetrofitClient.create(sessionManager)
-    var isSearchBarActive by remember { mutableStateOf(false) }
+    val isSearchBar by remember { mutableStateOf(true) }
+    val isSearchBarActive = remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -234,7 +232,14 @@ fun HomePage() {
                     .fillMaxSize()
                     .padding(it), contentAlignment = Alignment.Center
             ) {
-                SearchBar(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController)
+                if (isSearchBar) {
+                    SearchBar(
+                        apiService = apiService,
+                        sessionManager = sessionManager,
+                        navHostController = navHostController,
+                        isSearchBarActive = isSearchBarActive
+                    )
+                }
                 NavigationView(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController)
             }
         }
