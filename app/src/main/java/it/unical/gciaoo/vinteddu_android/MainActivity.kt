@@ -113,7 +113,7 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
         }
         composable(Routes.LOSTPASSWORD.route) {
             isSearchBar.value = false
-            PasswordLostPage()
+            PasswordLostPage(navHostController= navHostController, apiService= apiService, sessionManager= sessionManager)
         }
         composable(Routes.ITEMS.route, arguments = listOf(navArgument("id") { type = NavType.StringType})) {
             isSearchBar.value = true
@@ -124,7 +124,7 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
         composable(Routes.PROFILE.route) {
             isSearchBar.value = true
             val userViewModel = UserViewModel()
-            PaginaPreferiti(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
+            PaginaPreferiti(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager, navHostController)
 
             //Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
         }

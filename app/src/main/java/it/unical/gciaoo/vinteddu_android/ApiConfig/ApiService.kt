@@ -73,4 +73,12 @@ interface ApiService {
         @Field("prezzo") prezzo: BigDecimal,
         @Field("immagine") immagine : String
     ): Response<String>
+
+    @FormUrlEncoded
+    @POST("/api/v1/newPassword")
+    suspend fun getNewPassword(
+        @Field("email") email: String,
+        @Field("username") username: String,
+    ): Response<String>
+
 }

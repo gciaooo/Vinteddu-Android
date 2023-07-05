@@ -358,12 +358,17 @@ fun InputField(name: String, modifier: Modifier, fieldState: MutableState<String
 }
 
 @Composable
-fun PasswordLostPage() {
+fun PasswordLostPage(navHostController: NavHostController, apiService: ApiService, sessionManager: SessionManager) {
     val commonModifier = Modifier
         .fillMaxWidth()
         .padding(20.dp)
 
     val emailState = remember { mutableStateOf("") }
+    val usernameState = remember {
+        mutableStateOf("")
+    }
+    val coroutineScope = rememberCoroutineScope()
+    val showDialog = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.padding(all = 5.dp),
@@ -385,6 +390,7 @@ fun PasswordLostPage() {
                 .weight(0.2f)
         )
         InputField(name = stringResource(R.string.user_email), modifier = commonModifier, fieldState = emailState)
+        InputField(name = stringResource(R.string.user_username), modifier = commonModifier, fieldState = usernameState)
         Spacer(modifier = Modifier.weight(0.2f))
         Button(content = {
             Text(stringResource(R.string.lost_password_button))
@@ -393,9 +399,41 @@ fun PasswordLostPage() {
                 .padding(vertical = 30.dp)
                 .height(IntrinsicSize.Max),
             onClick = {
+                val username = usernameState.value
+                val email = emailState.value
+
+                coroutineScope.launch {
+                    try{
+                        showDialog.value = true
+                        val response = apiService.getNewPassword(email, username)
+                    }catch(e: Exception){}
+                }
+
 
             }
         )
+        if (showDialog.value) {
+            AlertDialog(
+                onDismissRequest = {
+                    showDialog.value = false
+                },
+                title = {
+                    Text(text = "Nuova password inviata all'indirizzo email")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            navHostController.navigate(Routes.LOGIN.route)
+                            showDialog.value = false // Chiudi il popup
+                        }
+                    ) {
+                        Text(text = "OK")
+                    }
+                },
+                modifier = Modifier.padding(16.dp)
+            )
+        }
         Spacer(modifier = Modifier.weight(1f))
+
     }
 }
