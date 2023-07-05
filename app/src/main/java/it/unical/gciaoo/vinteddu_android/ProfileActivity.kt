@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
@@ -168,13 +169,13 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
 }
 
 @Composable
-fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager) {
+fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager, navHostController:NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     val token = sessionManager.getToken()
     val preferiti = remember { mutableListOf<Item>() }
 
     LaunchedEffect(key1 = token, key2 = preferiti){
-        val response = apiService.getFavorites("Bearer $token", 2)
+        val response = apiService.getFavorites("Bearer $token", token!!)
         if(response.isSuccessful){
             for(item in response.body()!!){
                 preferiti.add(item)
@@ -189,7 +190,8 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager) {
         ) {
             Text(
                 text = "Preferiti",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(16.dp)
             )
 
@@ -213,18 +215,7 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager) {
                                 text = AnnotatedString(prodotto.nome),
                                 onClick = {
                                     coroutineScope.launch {
-                                        try{
-                                            val cambio_page= apiService.getItem(token,
-                                                prodotto.id!!
-                                            )
-
-                                            if(cambio_page.isSuccessful){
-                                                //navHostController.navigate()
-
-                                            }
-                                        }catch (e: Exception){
-
-                                        }
+                                        navHostController.navigate("items/${prodotto.id}")
                                     }
 
 
@@ -246,13 +237,12 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager) {
 }
 
 @Composable
-fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManager) {
+fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManager, navHostController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     val token = sessionManager.getToken()
     val preferiti = remember { mutableListOf<Item>() }
-
     LaunchedEffect(key1 = token, key2 = preferiti){
-        val response = apiService.getItemInVendita("Bearer $token", 2)
+        val response = apiService.getItemInVendita("Bearer $token", token!!)
         if(response.isSuccessful){
             for(item in response.body()!!){
                 preferiti.add(item)
@@ -266,8 +256,9 @@ fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManag
 
         ) {
             Text(
-                text = "Preferiti",
-                style = MaterialTheme.typography.bodyMedium,
+                text = "Oggetti in vendita o venduti",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(16.dp)
             )
 
@@ -291,18 +282,7 @@ fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManag
                                 text = AnnotatedString(prodotto.nome),
                                 onClick = {
                                     coroutineScope.launch {
-                                        try{
-                                            val cambio_page= apiService.getItem(token,
-                                                prodotto.id!!
-                                            )
-
-                                            if(cambio_page.isSuccessful){
-                                                //navHostController.navigate()
-
-                                            }
-                                        }catch (e: Exception){
-
-                                        }
+                                        navHostController.navigate("items/${prodotto.id}")
                                     }
 
 
@@ -311,6 +291,10 @@ fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManag
                             )
                             Text(
                                 text = "Prezzo: ${formattaPrezzo(prodotto.prezzo!!)}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Stato: ${(prodotto.stato)}",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }

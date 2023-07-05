@@ -56,11 +56,11 @@ interface ApiService {
     @GET("/api/v3/search/{nome}")
     suspend fun getSearch(@Header("Authorization") token:String?, @Path("nome") nome: String): Response<List<Item>>
 
-    @GET("/api/v2/Favorites/{userId}")
-    suspend fun getFavorites(@Header("Authorization") token:String?, @Path("userId") userId: Long): Response<List<Item>>
+    @GET("/api/v2/Favorites/{token}")
+    suspend fun getFavorites(@Header("Authorization") token:String?, @Path("token") token_: String): Response<List<Item>>
 
-    @GET("/api/v2/inVendita/{userId}")
-    suspend fun getItemInVendita(@Header("Authorization") token:String?, @Path("userId") userId: Long): Response<List<Item>>
+    @GET("/api/v2/inVendita/{token}")
+    suspend fun getItemInVendita(@Header("Authorization") token:String?, @Path("token")token_: String): Response<List<Item>>
 
 
     @FormUrlEncoded
