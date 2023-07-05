@@ -3,6 +3,7 @@ package it.unical.gciaoo.vinteddu_android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,13 +87,15 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHostController: NavHostController) {
+fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHostController: NavHostController, isSearchBar: MutableState<Boolean>) {
     NavHost(navController = navHostController, startDestination = Routes.HOME.route) {
         composable(Routes.HOME.route) {
+            isSearchBar.value = true
             //TODO: Main page
             MainPage(apiService = apiService, sessionManager = sessionManager)
         }
         composable(Routes.LOGIN.route) {
+            isSearchBar.value = false
             Login(
                 navHostController = navHostController,
                 apiService = apiService,
@@ -99,6 +103,7 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
             )
         }
         composable(Routes.REGISTER.route) {
+            isSearchBar.value = false
             Register(
                 userFormViewModel = UserFormViewModel(),
                 addressFormViewModel = AddressFormViewModel(),
@@ -107,14 +112,17 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
             )
         }
         composable(Routes.LOSTPASSWORD.route) {
+            isSearchBar.value = false
             PasswordLostPage()
         }
         composable(Routes.ITEMS.route, arguments = listOf(navArgument("id") { type = NavType.StringType})) {
+            isSearchBar.value = true
             it.arguments?.getString("id")?.let { id ->
                 ItemPage(apiService = apiService, sessionManager = sessionManager, itemId = id.toLong())
             }
         }
         composable(Routes.PROFILE.route) {
+            isSearchBar.value = true
             val userViewModel = UserViewModel()
             PaginaPreferiti(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager)
 
@@ -163,12 +171,12 @@ fun VintedduTopAppBar(
 fun MainPage(apiService: ApiService, sessionManager: SessionManager) {
 
     val token=sessionManager.getToken()
-    LaunchedEffect(key1 = token){
-        val response = apiService.getCurrentUser("Bearer $token", token)
-        if(response.isSuccessful){
-            sessionManager.saveId(response.body()!!.id)
-        }
-    }
+//    LaunchedEffect(key1 = token){
+//        val response = apiService.getCurrentUser("Bearer $token", token)
+//        if(response.isSuccessful){
+//            sessionManager.saveId(response.body()!!.id)
+//        }
+//    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top,
@@ -204,7 +212,7 @@ fun HomePage() {
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
     val apiService = RetrofitClient.create(sessionManager)
-    val isSearchBar by remember { mutableStateOf(true) }
+    val isSearchBar = remember { mutableStateOf(true) }
     val isSearchBarActive = remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
@@ -213,7 +221,8 @@ fun HomePage() {
             Drawer(
                 navHostController = navHostController,
                 drawerState = drawerState,
-                coroutineScope = coroutineScope
+                coroutineScope = coroutineScope,
+                sessionManager = sessionManager
             )
         },
         gesturesEnabled = true
@@ -232,7 +241,7 @@ fun HomePage() {
                     .fillMaxSize()
                     .padding(it), contentAlignment = Alignment.Center
             ) {
-                if (isSearchBar) {
+                if (isSearchBar.value) {
                     SearchBar(
                         apiService = apiService,
                         sessionManager = sessionManager,
@@ -240,7 +249,7 @@ fun HomePage() {
                         isSearchBarActive = isSearchBarActive
                     )
                 }
-                NavigationView(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController)
+                NavigationView(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController, isSearchBar = isSearchBar)
             }
         }
     }
@@ -250,11 +259,14 @@ fun HomePage() {
 fun Drawer(
     navHostController: NavHostController,
     drawerState: DrawerState,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    sessionManager: SessionManager
 ) {
     //TODO: remove login item from drawer
     val routes = listOf(Routes.HOME, Routes.LOGIN)
     val selectedItem = remember { mutableStateOf(routes[0].icon) }
+
+    val isLogged = remember { mutableStateOf(sessionManager.isLoggedIn()) }
     ModalDrawerSheet() {
         Card(
             modifier = Modifier
@@ -263,19 +275,28 @@ fun Drawer(
         ) {
             Icon(
                 Icons.Rounded.Person, contentDescription = "profile avatar",
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(80.dp).clickable {
+                    coroutineScope.launch {
+                        drawerState.close()
+                        navHostController.navigate(Routes.PROFILE.route) {
+                            popUpTo(Routes.PROFILE.route)
+                        }
+                    }
+                }
             )
         }
-        Button(
-            onClick = {
-                coroutineScope.launch {
-                    drawerState.close()
-                }
-                navHostController.navigate(Routes.LOGIN.route)
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text(stringResource(R.string.login))
+        if (!isLogged.value) {
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        drawerState.close()
+                    }
+                    navHostController.navigate(Routes.LOGIN.route)
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(stringResource(R.string.login))
+            }
         }
         Spacer(Modifier.height(12.dp))
         routes.forEach { item ->
