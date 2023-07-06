@@ -123,10 +123,17 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
         }
         composable(Routes.PROFILE.route) {
             isSearchBar.value = true
-            val userViewModel = UserViewModel()
-            PaginaPreferiti(apiService = RetrofitClient.create(sessionManager), sessionManager = sessionManager, navHostController)
+            PaginaPreferiti(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController)
 
             //Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
+        }
+        composable(Routes.FAVORITES.route) {
+            isSearchBar.value = true
+            PaginaPreferiti(
+                apiService = apiService,
+                sessionManager = sessionManager,
+                navHostController = navHostController
+            )
         }
 //        composable(Routes.SEARCH.route) {
 //            SearchPage()
@@ -262,11 +269,10 @@ fun Drawer(
     coroutineScope: CoroutineScope,
     sessionManager: SessionManager
 ) {
-    //TODO: remove login item from drawer
-    val routes = listOf(Routes.HOME, Routes.LOGIN)
-    val selectedItem = remember { mutableStateOf(routes[0].icon) }
-
     val isLogged = remember { mutableStateOf(sessionManager.isLoggedIn()) }
+
+    val routes = if (!isLogged.value) listOf(Routes.HOME) else listOf(Routes.HOME, Routes.FAVORITES)
+    val selectedItem = remember { mutableStateOf(routes[0].icon) }
     ModalDrawerSheet() {
         Card(
             modifier = Modifier
@@ -275,14 +281,18 @@ fun Drawer(
         ) {
             Icon(
                 Icons.Rounded.Person, contentDescription = "profile avatar",
-                modifier = Modifier.size(80.dp).clickable {
-                    coroutineScope.launch {
-                        drawerState.close()
-                        navHostController.navigate(Routes.PROFILE.route) {
-                            popUpTo(Routes.PROFILE.route)
+                modifier = Modifier
+                    .size(80.dp)
+                    .clickable {
+                        if (isLogged.value) {
+                            coroutineScope.launch {
+                                drawerState.close()
+                                navHostController.navigate(Routes.PROFILE.route) {
+                                    popUpTo(Routes.PROFILE.route)
+                                }
+                            }
                         }
                     }
-                }
             )
         }
         if (!isLogged.value) {

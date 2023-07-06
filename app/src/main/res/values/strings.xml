@@ -45,4 +45,5 @@
     <string name="lost_password_prompt">Recover password</string>
     <string name="lost_password_button">Send recovery code</string>
     <string name="lost_password_subtitle">We\'ll send a recovery code to your email address</string>
+    <string name="favorites">Favorite product</string>
 </resources>

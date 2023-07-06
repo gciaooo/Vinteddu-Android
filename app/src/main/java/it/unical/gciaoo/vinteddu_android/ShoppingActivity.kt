@@ -108,7 +108,7 @@ fun SearchBar(
                     items(item_) { item ->
                         val itemModifier = Modifier.clickable {
                         }
-                        ItemPreview(item.id.toString(), itemModifier)
+                        ItemPreview(item, itemModifier)
                     }
                 }
             }
@@ -181,9 +181,10 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
 }
 
 @Composable
-fun ItemPreview(id: String, modifier: Modifier) {
+fun ItemPreview(item: Item, modifier: Modifier) {
     val itemImage by remember { mutableStateOf<Bitmap?>(null)}
-    val itemName by remember { mutableStateOf<String?>(null) }
+    val itemName by remember { mutableStateOf<String?>(item.nome) }
+    val itemPrice by remember { mutableStateOf(item.prezzo) }
     ListItem(
         headlineContent = {
             Text(itemName ?: stringResource(R.string.loading_wait))
@@ -196,6 +197,10 @@ fun ItemPreview(id: String, modifier: Modifier) {
             else {
                 Icon(Icons.Outlined.Refresh, contentDescription = stringResource(iconName))
             }
+        },
+        trailingContent = {
+            val price = itemPrice?: 0
+            Text(price.toString())
         },
         modifier = modifier
     )

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class Routes(val route: String, val icon: ImageVector, val stringName : Int) {
@@ -17,4 +18,5 @@ enum class Routes(val route: String, val icon: ImageVector, val stringName : Int
     SEARCH("search", Icons.Default.Search, R.string.search),
     LOSTPASSWORD("login/recovery", Icons.Default.Place, R.string.lost_password),
     ITEMS("items/{id}", Icons.Default.List, R.string.item_preview_icon),
+    FAVORITES("favorites", Icons.Default.Star, R.string.favorites)
 }
