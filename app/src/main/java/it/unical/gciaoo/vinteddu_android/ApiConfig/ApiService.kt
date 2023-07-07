@@ -24,12 +24,12 @@ interface ApiService {
     @GET("/api/v2/user/{token}")
     suspend fun getCurrentUser(@Header("Authorization") token:String?, @Path("token") token_: String?) : Response<UtenteDTO>
 
-    @GET("/api/v2/wallet/{userId}")
-    suspend fun getSaldo(@Header("Authorization") token:String?, @Path("userId") id: Long?) : Response<Wallet>
+    @GET("/api/v2/wallet/{token}")
+    suspend fun getSaldo(@Header("Authorization") token:String?, @Path("token") token_: String?) : Response<Wallet>
 
     @FormUrlEncoded
-    @POST("/api/v2/Wallet/{userId}")
-    suspend fun wallet_recharge(@Header("Authorization") token:String?,  @Path("userId") id: Long?, @Field("amount") amount: Int?) : Response<String>
+    @POST("/api/v2/WalletCharge/{token}")
+    suspend fun wallet_recharge(@Header("Authorization") token:String?,  @Path("token") token_: String?, @Field("amount") amount: Int?) : Response<Unit>
 
     @FormUrlEncoded
     @POST("/api/v1/authenticate")

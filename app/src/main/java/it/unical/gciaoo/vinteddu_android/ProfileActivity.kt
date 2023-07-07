@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
@@ -54,6 +57,8 @@ import java.io.FileOutputStream
 import java.lang.Thread.sleep
 import java.text.NumberFormat
 
+
+
 @Composable
 fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager: SessionManager
 ) {
@@ -62,19 +67,11 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
     val errorMessageState = remember { mutableStateOf("") }
     val token = sessionManager.getToken();
     val userDto = remember { mutableStateOf<UtenteDTO?>(null) }
-    val wallet = remember { mutableStateOf<Wallet?>(null) }
-    val commonModifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-    val coroutineScope = rememberCoroutineScope()
-    var intFieldValue by remember { mutableStateOf("") }
     LaunchedEffect(key1 = token, key2 = userDto.value) {
         // Effettua la chiamata API per ottenere UtenteDTO
         val response = apiService.getCurrentUser("Bearer $token", token)
         if (response.isSuccessful) {
             userDto.value = response.body()
-            val response_2 = apiService.getSaldo("Bearer $token", userDto.value?.id)
-            if(response_2.isSuccessful) {
-                wallet.value = response_2.body()
-            }
             updateProfile(userDto.value, userViewModel)// Aggiorna userState nel ViewModel
         } else {
             errorMessageState.value = "Errore durante la richiesta dell'utente"
@@ -108,56 +105,6 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
                 modifier = Modifier.padding(16.dp)
             )
 
-            Text(
-                text = "Saldo:$ ${wallet.value?.saldo}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 30.dp)
-            ) {
-                Button(
-                    content={
-                            Text("Ricarica wallet")
-                    },
-                    modifier = commonModifier
-                        .fillMaxWidth()
-                        .padding(vertical = 30.dp)
-                        .height(IntrinsicSize.Max),
-                    onClick = {
-                        coroutineScope.launch {
-                            try {
-                                val intValue = intFieldValue.toIntOrNull()
-                                if (intValue != null) {
-                                    val resp = apiService.wallet_recharge("Bearer $token",userDto.value?.id,intValue)
-                                } else {
-                                    // Valore inserito non è un intero valido
-                                }
-                            } catch (e: Exception) {
-                                // Si è verificato un errore durante la chiamata API
-                            }
-                        }
-                    },
-                )
-
-
-                TextField(
-                    value = intFieldValue,
-                    onValueChange = { value ->
-                        intFieldValue = value.takeIf { it.isEmpty() || it.toIntOrNull() != null } ?: intFieldValue
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    label = { Text("Inserisci l'importo della ricarica") },
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(bottom = 16.dp)
-                        .fillMaxWidth()
-                )
-            }
-//clic
         }
 
     }else{
@@ -193,36 +140,41 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager, navH
             )
 
 
-            for (prodotto in preferiti) {
-                Card(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                items(preferiti) { prodotto ->
+                    Card(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
                     ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
 //                        Box(modifier = Modifier.height(100.dp)) {
 //
 //                        }
 
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            ClickableText(
-                                text = AnnotatedString(prodotto.nome),
-                                onClick = {
-                                    coroutineScope.launch {
-                                        navHostController.navigate("items/${prodotto.id}")
-                                    }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                ClickableText(
+                                    text = AnnotatedString(prodotto.nome),
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            navHostController.navigate("items/${prodotto.id}")
+                                        }
 
 
-                                },
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = "Prezzo: ${formattaPrezzo(prodotto.prezzo!!)}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                                    },
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "Prezzo: ${formattaPrezzo(prodotto.prezzo!!)}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
                 }
@@ -237,17 +189,17 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager, navH
 fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManager, navHostController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     val token = sessionManager.getToken()
-    val preferiti = remember { mutableListOf<Item>() }
-    LaunchedEffect(key1 = token, key2 = preferiti){
+    val items = remember { mutableListOf<Item>() }
+    LaunchedEffect(key1 = token, key2 = items){
         val response = apiService.getItemInVendita("Bearer $token", token!!)
         if(response.isSuccessful){
             for(item in response.body()!!){
-                preferiti.add(item)
+                items.add(item)
             }
         }
     }
 
-    if(preferiti.isNotEmpty()) {
+    if(items.isNotEmpty()) {
         Column(
             modifier = Modifier.padding(16.dp)
 
@@ -260,44 +212,50 @@ fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManag
             )
 
 
-            for (prodotto in preferiti) {
-                Card(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                items(items) { prodotto->
+                    Card(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
                     ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
 //                        Box(modifier = Modifier.height(100.dp)) {
 //
 //                        }
 
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            ClickableText(
-                                text = AnnotatedString(prodotto.nome),
-                                onClick = {
-                                    coroutineScope.launch {
-                                        navHostController.navigate("items/${prodotto.id}")
-                                    }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                ClickableText(
+                                    text = AnnotatedString(prodotto.nome),
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            navHostController.navigate("items/${prodotto.id}")
+                                        }
 
 
-                                },
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = "Prezzo: ${formattaPrezzo(prodotto.prezzo!!)}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = "Stato: ${(prodotto.stato)}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                                    },
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "Prezzo: ${formattaPrezzo(prodotto.prezzo!!)}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "Stato: ${(prodotto.stato)}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
                 }
             }
+
         }
     }else{
         sleep(3000)
@@ -331,33 +289,38 @@ fun PaginaProdottiAcquistati(apiService: ApiService, sessionManager: SessionMana
             )
 
 
-            for (item in acquisti) {
-                Card(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                items(acquisti) { item ->
+                    Card(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
                     ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
 //                        Box(modifier = Modifier.height(100.dp)) {
 //
 //                        }
 
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text(
-                                text = item.nome,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = "Prezzo: ${formattaPrezzo(item.prezzo!!)}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = "Stato: ${(item.stato)}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(
+                                    text = item.nome,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "Prezzo: ${formattaPrezzo(item.prezzo!!)}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "Stato: ${(item.stato)}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
                 }
@@ -488,6 +451,136 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
     }
 }
 
+@Composable
+fun Wallet(apiService: ApiService, sessionManager: SessionManager, navHostController: NavHostController) {
+    val wallet = remember { mutableStateOf<Wallet?>(null) }
+    val token = sessionManager.getToken()
+    val commonModifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+    val coroutineScope = rememberCoroutineScope()
+    var intFieldValue by remember { mutableStateOf("") }
+    val showDialog = remember { mutableStateOf(false) }
+    val showDialog2 = remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = token, key2 = wallet){
+        val response = apiService.getSaldo("Bearer $token", token!!)
+        if(response.isSuccessful){
+            wallet.value = response.body();
+        }
+    }
+
+    if(wallet.value!=null) {
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center)
+        {
+
+
+            Text(
+                text = "Saldo:$ ${wallet.value?.saldo}",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(16.dp)
+            )
+
+
+            Card(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        if (showDialog.value) {
+                            AlertDialog(
+                                onDismissRequest = {
+                                    showDialog.value = false
+                                },
+                                title = {
+                                    Text(text = "Inserisci un importo valido")
+                                },
+                                confirmButton = {
+                                    Button(
+                                        onClick = {
+                                            showDialog.value = false // Chiudi il popup
+                                        }
+                                    ) {
+                                        Text(text = "OK")
+                                    }
+                                },
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                        if (showDialog2.value) {
+                            AlertDialog(
+                                onDismissRequest = {
+                                    showDialog2.value = false
+                                },
+                                title = {
+                                    Text(text = "Wallet ricaricato")
+                                },
+                                confirmButton = {
+                                    Button(
+                                        onClick = {
+                                            navHostController.navigate(Routes.WALLET.route)
+                                            showDialog2.value = false // Chiudi il popup
+                                        }
+                                    ) {
+                                        Text(text = "OK")
+                                    }
+                                },
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                        Button(
+                            content = {
+                                Text("Ricarica wallet")
+                            },
+                            modifier = commonModifier
+                                .fillMaxWidth()
+                                .padding(vertical = 30.dp)
+                                .height(IntrinsicSize.Max),
+                            onClick = {
+                                coroutineScope.launch {
+                                    try {
+                                        val intValue = intFieldValue.toIntOrNull()
+                                        if (intValue != null) {
+                                            val resp = apiService.wallet_recharge(
+                                                "Bearer $token",
+                                                token,
+                                                intValue
+                                            )
+                                            if(resp.isSuccessful){
+                                                showDialog2.value=true
+                                            }
+                                        } else {
+                                            showDialog.value=true
+                                        }
+                                    } catch (e: Exception) {
+                                        // Si è verificato un errore durante la chiamata API
+                                    }
+                                }
+                            },
+                        )
+                        TextField(
+                            value = intFieldValue,
+                            onValueChange = { value ->
+                                intFieldValue = value.takeIf { it.isEmpty() || it.toIntOrNull() != null } ?: intFieldValue
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            label = { Text("Inserisci l'importo della ricarica") },
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(bottom = 16.dp)
+                                .fillMaxWidth()
+                        )
+
+                    }
+                }
+            }
+        }
+    }else{
+        sleep(3000)
+    }
+}
 
 fun formattaPrezzo(prezzo: Long): String {
     val formatter = NumberFormat.getCurrencyInstance()
