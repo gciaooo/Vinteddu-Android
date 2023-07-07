@@ -3,6 +3,7 @@ package it.unical.gciaoo.vinteddu_android
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
@@ -23,8 +24,8 @@ enum class Routes(val route: String, val icon: ImageVector, val stringName : Int
     ITEMS("items/{id}", Icons.Default.List, R.string.item_preview_icon),
     FAVORITES("favorites", Icons.Default.Star, R.string.favorites),
     ONSALE("onsale", Icons.Default.ShoppingCart, R.string.on_sale),
-    PURCHASED("purchases", Icons.Default.CheckCircle,R.string.purchase),
-    ADDITEM("addItem", Icons.Default.Add, R.string.add_item);
-
+    PURCHASED("purchases", Icons.Default.CheckCircle,R.string.purchased),
+    ADDITEM("addItem", Icons.Default.Add, R.string.add_item),
+    WALLET("wallet", Icons.Default.Email, R.string.wallet);
 
 }

@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">Vinteddu-Android</string>
     <string name="title">Vinteddu</string>
-    <string name="login_username">Username or e-mail</string>
+    <string name="login_username">Username</string>
     <string name="login_password">Password</string>
     <string name="login">Sign in</string>
+    <string name="logout">Logout</string>
     <string name="register">Sign up</string>
     <string name="register_prompt">New user? Sign up here.</string>
     <string name="drawer_icon">Drawer Icon</string>
@@ -45,8 +46,9 @@
     <string name="lost_password_prompt">Recover password</string>
     <string name="lost_password_button">Send recovery code</string>
     <string name="lost_password_subtitle">We\'ll send a recovery code to your email address</string>
-    <string name="favorites">Favorite product</string>
-    <string name="on_sale">Item on sale</string>
+    <string name="favorites">Favorites</string>
+    <string name="on_sale">Items on sale</string>
     <string name="purchased">Purchased items</string>
     <string name="add_item">Add item</string>
+    <string name="wallet">Wallet</string>
 </resources>
