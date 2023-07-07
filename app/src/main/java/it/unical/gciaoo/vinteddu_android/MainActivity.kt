@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHostController: NavHostController, isSearchBar: MutableState<Boolean>) {
+fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHostController: NavHostController, isSearchBar: MutableState<Boolean>, isLogged: MutableState<Boolean>) {
     NavHost(navController = navHostController, startDestination = Routes.HOME.route) {
         composable(Routes.HOME.route) {
             isSearchBar.value = true
@@ -99,7 +99,8 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
             Login(
                 navHostController = navHostController,
                 apiService = apiService,
-                sessionManager = sessionManager
+                sessionManager = sessionManager,
+                isLogged= isLogged
             )
         }
         composable(Routes.REGISTER.route) {
@@ -129,13 +130,46 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
             Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
         }
         composable(Routes.FAVORITES.route) {
-            isSearchBar.value = true
+            isSearchBar.value = false
             PaginaPreferiti(
                 apiService = apiService,
                 sessionManager = sessionManager,
                 navHostController = navHostController
             )
         }
+        composable(Routes.ONSALE.route) {
+            isSearchBar.value = false
+            PaginaProdottiInVendita(
+                apiService = apiService,
+                sessionManager = sessionManager,
+                navHostController = navHostController
+            )
+        }
+        composable(Routes.PURCHASED.route) {
+            isSearchBar.value = false
+            PaginaProdottiAcquistati(
+                apiService = apiService,
+                sessionManager = sessionManager,
+                navHostController = navHostController
+            )
+        }
+        composable(Routes.ADDITEM.route) {
+            isSearchBar.value = false
+            AddItem(
+                apiService = apiService,
+                sessionManager = sessionManager,
+                navHostController = navHostController
+            )
+        }
+        composable(Routes.WALLET.route) {
+            isSearchBar.value = true
+            Wallet(
+                apiService = apiService,
+                sessionManager = sessionManager,
+                navHostController = navHostController
+            )
+        }
+
         composable(Routes.SEARCH.route) { Box(Modifier.fillMaxSize()) }
     }
 }
@@ -167,14 +201,6 @@ fun VintedduTopAppBar(
 //@Preview(showBackground = true)
 @Composable
 fun MainPage(apiService: ApiService, sessionManager: SessionManager) {
-
-    val token=sessionManager.getToken()
-//    LaunchedEffect(key1 = token){
-//        val response = apiService.getCurrentUser("Bearer $token", token)
-//        if(response.isSuccessful){
-//            sessionManager.saveId(response.body()!!.id)
-//        }
-//    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top,
@@ -212,6 +238,7 @@ fun HomePage() {
     val apiService = RetrofitClient.create(sessionManager)
     val isSearchBar = remember { mutableStateOf(true) }
     val isSearchBarActive = remember { mutableStateOf(false) }
+    val isLogged = remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -220,7 +247,8 @@ fun HomePage() {
                 navHostController = navHostController,
                 drawerState = drawerState,
                 coroutineScope = coroutineScope,
-                sessionManager = sessionManager
+                sessionManager = sessionManager,
+                isLogged = isLogged
             )
         },
         gesturesEnabled = true
@@ -244,10 +272,10 @@ fun HomePage() {
                         apiService = apiService,
                         sessionManager = sessionManager,
                         navHostController = navHostController,
-                        isSearchBarActive = isSearchBarActive
+                        isSearchBarActive = isSearchBarActive,
                     )
                 }
-                NavigationView(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController, isSearchBar = isSearchBar)
+                NavigationView(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController, isSearchBar = isSearchBar, isLogged = isLogged)
             }
         }
     }
@@ -258,11 +286,12 @@ fun Drawer(
     navHostController: NavHostController,
     drawerState: DrawerState,
     coroutineScope: CoroutineScope,
-    sessionManager: SessionManager
+    sessionManager: SessionManager,
+    isLogged : MutableState<Boolean>
 ) {
-    val isLogged = remember { mutableStateOf(sessionManager.isLoggedIn()) }
+    //val isLogged = remember { mutableStateOf(sessionManager.isLoggedIn()) }
 
-    val routes = if (!isLogged.value) listOf(Routes.HOME) else listOf(Routes.HOME, Routes.FAVORITES)
+    val routes = if (!isLogged.value) listOf(Routes.HOME) else listOf(Routes.HOME, Routes.FAVORITES, Routes.ONSALE, Routes.PURCHASED, Routes.ADDITEM, Routes.WALLET)
     val selectedItem = remember { mutableStateOf(routes[0].icon) }
     ModalDrawerSheet() {
         Card(
@@ -317,18 +346,21 @@ fun Drawer(
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
             )
         }
-        Button(
-            onClick = {
-                coroutineScope.launch {
-                    drawerState.close()
-                    sessionManager.clearToken()
-                    sessionManager.clearUsername()
-                }
-                navHostController.navigate(Routes.HOME.route)
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text(stringResource(R.string.login))
+        if (isLogged.value) {
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        drawerState.close()
+                        isLogged.value = false
+                        sessionManager.clearToken()
+                        sessionManager.clearUsername()
+                    }
+                    navHostController.navigate(Routes.HOME.route)
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(stringResource(R.string.logout))
+            }
         }
     }
 }

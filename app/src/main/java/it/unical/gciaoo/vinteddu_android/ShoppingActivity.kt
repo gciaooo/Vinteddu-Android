@@ -183,7 +183,6 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
                         val res = apiService.saldo("Bearer $token", itemId, token)
                         if(res.isSuccessful){
                             showDialog.value = true
-                            val response = apiService.buyItem("Bearer $token", itemId, token).body()// Imposta lenient mode su Gson
                         }else{
                             showDialog2.value=true
                         }
@@ -205,16 +204,21 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
                         showDialog.value = false
                     },
                     title = {
-                        Text(text = "Acquistato")
+                        Text(text = "Vuoi acquistare questo oggetto?" +
+                        item.value!!.nome+
+                        "  $"+item.value!!.prezzo)
                     },
                     confirmButton = {
                         Button(
                             onClick = {
+                                coroutineScope.launch {
+                                    val response = apiService.buyItem("Bearer $token", itemId, token)
+                                }
                                 showDialog.value = false // Chiudi il popup
                                 navHostController.navigate(Routes.HOME.route)
                             }
                         ) {
-                            Text(text = "OK")
+                            Text(text = "Sì")
                         }
                     },
                     modifier = Modifier.padding(16.dp)

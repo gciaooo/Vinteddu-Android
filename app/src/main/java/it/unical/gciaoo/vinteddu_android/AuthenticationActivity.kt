@@ -45,7 +45,7 @@ import it.unical.gciaoo.vinteddu_android.viewmodels.UserFormViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun Login(navHostController: NavHostController, apiService: ApiService, sessionManager: SessionManager) {
+fun Login(navHostController: NavHostController, apiService: ApiService, sessionManager: SessionManager, isLogged: MutableState<Boolean>) {
     val commonModifier = Modifier
         .fillMaxWidth()
         .padding(20.dp)
@@ -88,11 +88,13 @@ fun Login(navHostController: NavHostController, apiService: ApiService, sessionM
 
                 coroutineScope.launch {
                     try {
+                        sessionManager.clearToken()
+                        sessionManager.clearUsername()
                         val response = apiService.authenticate(username, password)
                         if(response.isSuccessful){
                             sessionManager.saveUsername(username)
+                            isLogged.value = true
                             navHostController.navigate(Routes.HOME.route)
-                            //navHostController.navigate(ItemPage(apiService = apiService, sessionManager = SessionManager()))
                         }
 
                     } catch (e: Exception) {
