@@ -118,14 +118,15 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
         composable(Routes.ITEMS.route, arguments = listOf(navArgument("id") { type = NavType.StringType})) {
             isSearchBar.value = true
             it.arguments?.getString("id")?.let { id ->
-                ItemPage(apiService = apiService, sessionManager = sessionManager, itemId = id.toLong())
+                ItemPage(apiService = apiService, sessionManager = sessionManager, itemId = id.toLong(), navHostController=navHostController)
             }
         }
         composable(Routes.PROFILE.route) {
             isSearchBar.value = true
-            PaginaPreferiti(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController)
+            val userViewModel = UserViewModel()
+            //PaginaPreferiti(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController)
 
-            //Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
+            Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
         }
         composable(Routes.FAVORITES.route) {
             isSearchBar.value = true
@@ -315,6 +316,19 @@ fun Drawer(
                 },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
             )
+        }
+        Button(
+            onClick = {
+                coroutineScope.launch {
+                    drawerState.close()
+                    sessionManager.clearToken()
+                    sessionManager.clearUsername()
+                }
+                navHostController.navigate(Routes.HOME.route)
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text(stringResource(R.string.login))
         }
     }
 }

@@ -4,6 +4,7 @@ import it.unical.gciaoo.vinteddu_android.model.User
 import it.unical.gciaoo.vinteddu_android.model.Utente
 import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
 import it.unical.gciaoo.vinteddu_android.model.Wallet
+import okhttp3.HttpUrl
 import retrofit2.http.GET
 import retrofit2.Response
 import retrofit2.http.Body
@@ -80,5 +81,21 @@ interface ApiService {
         @Field("email") email: String,
         @Field("username") username: String,
     ): Response<String>
+
+
+    @FormUrlEncoded
+    @POST("/api/v1/buyItem/{item}")
+    suspend fun buyItem(@Header("Authorization") token:String?,  @Path("item") itemId: Long?, @Field("token") token_: String?) : Response<String>
+    @GET("/api/v1/SaldoOk/{itemId}/{token}")
+    suspend fun saldo(@Header("Authorization") token:String?, @Path("itemId") itemId: Long, @Path("token") token_: String?): Response<Unit>
+
+    @GET("/api/v2/getPurchase/{token}")
+    suspend fun getItemAcquistati(@Header("Authorization") token:String?, @Path("token") token_: String?): Response<List<Item>>
+
+
+    @FormUrlEncoded
+    @POST("/api/v1/addFavorites/{item}")
+    suspend fun addFavorites(@Header("Authorization") token:String?,  @Path("item") itemId: Long?, @Field("token") token_: String?) : Response<String>
+
 
 }

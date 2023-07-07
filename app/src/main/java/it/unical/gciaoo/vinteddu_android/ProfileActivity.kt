@@ -37,7 +37,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -48,13 +47,11 @@ import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
 import it.unical.gciaoo.vinteddu_android.model.Item
 import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
 import it.unical.gciaoo.vinteddu_android.model.Wallet
-import it.unical.gciaoo.vinteddu_android.ui.theme.Typography
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Thread.sleep
-import java.math.BigDecimal
 import java.text.NumberFormat
 
 @Composable
@@ -308,6 +305,69 @@ fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManag
 }
 
 @Composable
+fun PaginaProdottiAcquistati(apiService: ApiService, sessionManager: SessionManager, navHostController: NavHostController) {
+    val coroutineScope = rememberCoroutineScope()
+    val token = sessionManager.getToken()
+    val acquisti = remember { mutableListOf<Item>() }
+    LaunchedEffect(key1 = token, key2 = acquisti){
+        val response = apiService.getItemAcquistati("Bearer $token", token!!)
+        if(response.isSuccessful){
+            for(item in response.body()!!){
+                acquisti.add(item)
+            }
+        }
+    }
+
+    if(acquisti.isNotEmpty()) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+
+        ) {
+            Text(
+                text = "Oggetti acquistati",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(16.dp)
+            )
+
+
+            for (item in acquisti) {
+                Card(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .fillMaxWidth(),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+//                        Box(modifier = Modifier.height(100.dp)) {
+//
+//                        }
+
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = item.nome,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Prezzo: ${formattaPrezzo(item.prezzo!!)}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Stato: ${(item.stato)}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }else{
+        sleep(3000)
+    }
+}
+@Composable
 fun AddItem(navHostController: NavHostController, apiService: ApiService, sessionManager: SessionManager) {
     val commonModifier = Modifier
         .fillMaxWidth()
@@ -429,7 +489,7 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
 }
 
 
-fun formattaPrezzo(prezzo: BigDecimal): String {
+fun formattaPrezzo(prezzo: Long): String {
     val formatter = NumberFormat.getCurrencyInstance()
     return formatter.format(prezzo)
 }

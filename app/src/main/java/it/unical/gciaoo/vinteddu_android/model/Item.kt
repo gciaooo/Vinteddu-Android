@@ -23,7 +23,7 @@ data class Item(
     val id: Long?,
     var nome: String,
     var descrizione: String?,
-    var prezzo: BigDecimal?,
+    var prezzo: Long?,
     val dataCreazione: List<Int>?,
     val stato: String,
     val idUtente: Long?,

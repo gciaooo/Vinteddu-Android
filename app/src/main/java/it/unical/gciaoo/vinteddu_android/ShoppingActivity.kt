@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +49,9 @@ import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import kotlinx.coroutines.launch
 import java.lang.Thread.sleep
 
@@ -126,7 +130,7 @@ fun SearchBar(
                     items(searchResult) { item ->
                         val itemModifier = Modifier.clickable {
                         }
-                        ItemPreview(item, itemModifier)
+                        ItemPreview(item.id, itemModifier, item.nome)
                     }
                 }
             }
@@ -135,7 +139,7 @@ fun SearchBar(
 }
 
 @Composable
-fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Long) {
+fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Long, navHostController:NavHostController) {
     val buttonModifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 10.dp, vertical = 4.dp)
@@ -143,12 +147,15 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
     val imagesState = rememberLazyListState()
 
     val token = sessionManager.getToken()
-
+    val coroutineScope = rememberCoroutineScope()
+    val showDialog = remember { mutableStateOf(false) }
+    val showDialog2 = remember { mutableStateOf(false) }
+    val showDialog3 = remember { mutableStateOf(false) }
     val item = remember { mutableStateOf<Item?>(null) }
 
 
     LaunchedEffect(key1 = token/*, key2 = item.value*/){
-        val response = apiService.getItem("Bearer $token", 1)
+        val response = apiService.getItem("Bearer $token", itemId)
         sleep(20)
         if(response.isSuccessful){
             item.value = response.body()
@@ -170,18 +177,104 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
 //                }
             }
            // Text(item.value!!.price.toPlainString(), style = Typography.titleLarge)
-            Button(onClick = { /*TODO*/ }, modifier = buttonModifier) {
+            Button(onClick = {
+                coroutineScope.launch {
+                    try {
+                        val res = apiService.saldo("Bearer $token", itemId, token)
+                        if(res.isSuccessful){
+                            showDialog.value = true
+                            val response = apiService.buyItem("Bearer $token", itemId, token).body()// Imposta lenient mode su Gson
+                        }else{
+                            showDialog2.value=true
+                        }
+
+                    }catch(e: Exception ){
+                        e.printStackTrace()
+                    }
+                }
+                             }, modifier = buttonModifier) {
                 Text(stringResource(id = R.string.purchase))
                 Icon(
                     imageVector = Icons.Filled.ShoppingCart,
                     contentDescription = stringResource(R.string.purchase_icon)
                 )
             }
-            FilledTonalButton(onClick = { /*TODO*/ }, modifier = buttonModifier) {
+            if (showDialog.value) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showDialog.value = false
+                    },
+                    title = {
+                        Text(text = "Acquistato")
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showDialog.value = false // Chiudi il popup
+                                navHostController.navigate(Routes.HOME.route)
+                            }
+                        ) {
+                            Text(text = "OK")
+                        }
+                    },
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            if (showDialog2.value) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showDialog2.value = false
+                    },
+                    title = {
+                        Text(text = "Non hai abbastanza fondi")
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showDialog2.value = false // Chiudi il popup
+                            }
+                        ) {
+                            Text(text = "OK")
+                        }
+                    },
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            FilledTonalButton(
+                onClick = {
+                          coroutineScope.launch {
+                              try {
+                                  showDialog3.value = true
+                                  val response = apiService.addFavorites("Bearer $token", itemId, token)
+                              }catch(e: Exception){
+                                  //errore
+                              }
+                          }
+            }, modifier = buttonModifier) {
                 Text(stringResource(R.string.add_to_wishlist))
                 Icon(
                     imageVector = Icons.Outlined.Star,
                     contentDescription = stringResource(R.string.add_to_wishlist_icon)
+                )
+            }
+            if (showDialog3.value) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showDialog3.value = false
+                    },
+                    title = {
+                        Text(text = "Aggiunto ai preferiti")
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showDialog3.value = false // Chiudi il popup
+                            }
+                        ) {
+                            Text(text = "OK")
+                        }
+                    },
+                    modifier = Modifier.padding(16.dp)
                 )
             }
             Spacer(modifier = Modifier.padding(10.dp))
@@ -199,13 +292,12 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
 }
 
 @Composable
-fun ItemPreview(item: Item, modifier: Modifier) {
+fun ItemPreview(id: Long?, modifier: Modifier, name : String) {
     val itemImage by remember { mutableStateOf<Bitmap?>(null)}
-    val itemName by remember { mutableStateOf<String?>(item.nome) }
-    val itemPrice by remember { mutableStateOf(item.prezzo) }
+    //val itemName by remember { mutableStateOf<String?>(null) }
     ListItem(
         headlineContent = {
-            Text(itemName ?: stringResource(R.string.loading_wait))
+            Text(name ?: stringResource(R.string.loading_wait))
         },
         leadingContent = {
             val iconName = R.string.item_preview_icon
@@ -215,10 +307,6 @@ fun ItemPreview(item: Item, modifier: Modifier) {
             else {
                 Icon(Icons.Outlined.Refresh, contentDescription = stringResource(iconName))
             }
-        },
-        trailingContent = {
-            val price = itemPrice?: 0
-            Text(price.toString())
         },
         modifier = modifier
     )
