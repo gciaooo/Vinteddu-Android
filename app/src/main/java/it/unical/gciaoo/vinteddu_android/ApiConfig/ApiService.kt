@@ -85,7 +85,7 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST("/api/v1/buyItem/{item}")
-    suspend fun buyItem(@Header("Authorization") token:String?,  @Path("item") itemId: Long?, @Field("token") token_: String?) : Response<String>
+    suspend fun buyItem(@Header("Authorization") token:String?,  @Path("item") itemId: Long?, @Field("token") token_: String?) : Response<Unit>
     @GET("/api/v1/SaldoOk/{itemId}/{token}")
     suspend fun saldo(@Header("Authorization") token:String?, @Path("itemId") itemId: Long, @Path("token") token_: String?): Response<Unit>
 

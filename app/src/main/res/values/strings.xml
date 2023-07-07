@@ -46,4 +46,7 @@
     <string name="lost_password_button">Send recovery code</string>
     <string name="lost_password_subtitle">We\'ll send a recovery code to your email address</string>
     <string name="favorites">Favorite product</string>
+    <string name="on_sale">Item on sale</string>
+    <string name="purchased">Purchased items</string>
+    <string name="add_item">Add item</string>
 </resources>
