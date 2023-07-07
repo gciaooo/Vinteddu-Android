@@ -135,10 +135,7 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
                 navHostController = navHostController
             )
         }
-//        composable(Routes.SEARCH.route) {
-//            SearchPage()
-//        }
-
+        composable(Routes.SEARCH.route) { Box(Modifier.fillMaxSize()) }
     }
 }
 
@@ -163,13 +160,6 @@ fun VintedduTopAppBar(
             }
 
         },
-
-        actions = {
-            IconButton(onClick = { navHostController.navigate(Routes.PROFILE.route) }) {
-                Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.profile))
-            }
-        }
-
     )
 }
 

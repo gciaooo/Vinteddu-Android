@@ -15,6 +15,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Refresh
@@ -24,6 +26,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
@@ -60,8 +63,8 @@ fun SearchBar(
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
     val token = sessionManager.getToken()
-    val item_= remember { mutableListOf<Item>() }
-//    var searches = remember { mutableListOf<Item>() }
+    val searchResult = remember { mutableListOf<Item>() }
+
     Box(Modifier.fillMaxSize()) {
         Box(
             Modifier
@@ -80,32 +83,47 @@ fun SearchBar(
                         val res = apiService.getSearch("Bearer $token", text)
                         if(res.isSuccessful){
                             for(item in res.body()!!){
-                                item_.add(item)
+                                searchResult.add(item)
                             }
                         }
                     }
                 },
                 active = active,
                 onActiveChange = {
-                    if (it) {
-
+                    active = it
+                    if (active) {
+                        navHostController.navigate(Routes.SEARCH.route)
                     }
                     else {
-
+                        navHostController.popBackStack()
                     }
-                    active = it
                 },
                 placeholder = { Text(stringResource(R.string.search_bar_placeholder)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                leadingIcon = {
+                    if (!active)
+                        Icon(Icons.Default.Search, contentDescription = null)
+                    else
+                        IconButton(onClick = {
+                            active = false
+                            navHostController.popBackStack()
+                        }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = null)
+                        }},
+                trailingIcon = {
+                    if (active && text.isNotEmpty()) IconButton(onClick = { text = ""}) { Icon(Icons.Default.Close, contentDescription = null) }
+                }
             ) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().clickable {
-                                                                 active = false
-                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            active = false
+                            navHostController.popBackStack()
+                        },
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    items(item_) { item ->
+                    items(searchResult) { item ->
                         val itemModifier = Modifier.clickable {
                         }
                         ItemPreview(item, itemModifier)
