@@ -273,6 +273,7 @@ fun HomePage() {
                         sessionManager = sessionManager,
                         navHostController = navHostController,
                         isSearchBarActive = isSearchBarActive,
+                        isLogged = isLogged
                     )
                 }
                 NavigationView(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController, isSearchBar = isSearchBar, isLogged = isLogged)
