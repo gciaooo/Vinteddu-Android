@@ -2,7 +2,6 @@ package it.unical.gciaoo.vinteddu_android
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,6 +21,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -36,11 +36,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -77,34 +76,48 @@ fun Profile(apiService: ApiService, userViewModel: UserViewModel, sessionManager
             errorMessageState.value = "Errore durante la richiesta dell'utente"
         }
     }
-
     if (userDto.value != null) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
-
+        val userFields = mapOf(
+            R.string.user_username to userDto.value?.username,
+            R.string.user_email to userDto.value?.email,
+            R.string.user_firstName to userDto.value?.nome,
+            R.string.user_lastName to userDto.value?.cognome,
+            R.string.user_shippingAddress to userDto.value?.indirizzo,
+            R.string.user_phonenumber to userDto.value?.numeroTelefono
+        )
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top) {
             Text(
-            text = "Username: ${userDto.value?.username}",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(16.dp)
+                text = stringResource(R.string.profile_page),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(20.dp)
             )
-
-            Text(
-                text = "Email: ${userDto.value?.email}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            Text(
-                text = "Nome: ${userDto.value?.nome}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            Text(
-                text = "Cognome: ${userDto.value?.cognome}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-
+            for (field in userFields.keys) {
+                Card(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 10.dp), horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Text(text = stringResource(field),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier.weight(.5f)
+                            )
+                        Text(text = "${userFields[field]}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(.5f)
+                            )
+                    }
+                    Divider()
+                }
+            }
         }
 
     }else{
@@ -379,21 +392,23 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
         InputField(name = "Titolo inserzione", commonModifier, nameState)
         InputField(name = "Descrizione", commonModifier, descriptionState )
         InputField(name = "Prezzo", commonModifier, priceState )
-        if (imagePath.isNotEmpty()) {
-            val imagePainter: Painter = painterResource(R.drawable.felpa)
-            Image(
-                painter = imagePainter,
-                contentDescription = "Immagine selezionata",
-                modifier = Modifier
-                    .size(200.dp)
-                    .padding(16.dp),
-                contentScale = ContentScale.Crop
-            )
-        }
+//        if (imagePath.isNotEmpty()) {
+//            val imagePainter: Painter = painterResource(R.drawable.felpa)
+//            Image(
+//                painter = imagePainter,
+//                contentDescription = "Immagine selezionata",
+//                modifier = Modifier
+//                    .size(200.dp)
+//                    .padding(16.dp),
+//                contentScale = ContentScale.Crop
+//            )
+//        }
 
         Button(
-            onClick = { launcher.launch("image/*") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = commonModifier
+                .padding(vertical = 30.dp)
+                .height(IntrinsicSize.Max),
+            onClick = { launcher.launch("image/*") }
         ) {
             Text("Carica immagine")
         }

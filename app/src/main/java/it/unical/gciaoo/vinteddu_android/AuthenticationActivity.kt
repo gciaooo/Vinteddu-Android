@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -35,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
@@ -176,7 +176,7 @@ fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: Address
                     OutlinedTextField(
                         value = userState.firstName,
                         onValueChange = { userFormViewModel.updateFirstName(it) },
-                        label = { Text(stringResource(R.string.user_firstname)) },
+                        label = { Text(stringResource(R.string.user_firstName)) },
                         isError = userState.isFirstNameError,
                         singleLine = true,
                         modifier = commonModifier.weight(0.5f)
@@ -346,16 +346,31 @@ fun Register(userFormViewModel: UserFormViewModel, addressFormViewModel: Address
 
 @Composable
 fun InputField(name: String, modifier: Modifier, fieldState: MutableState<String>) {
-    //var field by remember { mutableStateOf("") }
+    val passName = stringResource(R.string.login_password)
+
     Row(horizontalArrangement = Arrangement.Center) {
-        TextField(
-            value = fieldState.value,
-            onValueChange = { newValue ->
-                fieldState.value = newValue },
-            label = { Text(name) },
-            singleLine = true,
-            modifier = modifier.padding(vertical = 5.dp)
-        )
+        if (name == passName) {
+            TextField(
+                value = fieldState.value,
+                onValueChange = { newValue ->
+                    fieldState.value = newValue },
+                label = { Text(name) },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+                modifier = modifier.padding(vertical = 5.dp)
+            )
+        }
+        else {
+            TextField(
+                value = fieldState.value,
+                onValueChange = { newValue ->
+                    fieldState.value = newValue },
+                label = { Text(name) },
+                singleLine = true,
+                modifier = modifier.padding(vertical = 5.dp)
+            )
+        }
     }
 }
 

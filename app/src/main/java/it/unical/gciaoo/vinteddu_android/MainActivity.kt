@@ -123,11 +123,11 @@ fun NavigationView(apiService: ApiService, sessionManager: SessionManager, navHo
             }
         }
         composable(Routes.PROFILE.route) {
-            isSearchBar.value = true
+            isSearchBar.value = false
             val userViewModel = UserViewModel()
             //PaginaPreferiti(apiService = apiService, sessionManager = sessionManager, navHostController = navHostController)
 
-            Profile(apiService = RetrofitClient.create(sessionManager), userViewModel, sessionManager = sessionManager)
+            Profile(apiService = apiService, userViewModel, sessionManager = sessionManager)
         }
         composable(Routes.FAVORITES.route) {
             isSearchBar.value = false

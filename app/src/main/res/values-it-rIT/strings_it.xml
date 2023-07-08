@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Vinteddu-Android</string>
+    <string name="title" translatable="false">Vinteddu</string>
+    <string name="login_username">Nome Utente</string>
+    <string name="login_password">Password</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="register">Registrazione</string>
+    <string name="register_prompt">Nuovo utente? Registrati quì</string>
+    <string name="drawer_icon">Icona Drawer</string>
+    <string name="back">Indietro</string>
+    <string name="user_firstName">Nome</string>
+    <string name="user_lastName">Cognome</string>
+    <string name="user_email">E-mail</string>
+    <string name="user_street">Via</string>
+    <string name="user_streetnumber">Numero Civico</string>
+    <string name="user_city">Città</string>
+    <string name="user_province">Provincia</string>
+    <string name="user_zipcode">Codice Postale</string>
+    <string name="user_username">Nome Utente</string>
+    <string name="user_phonenumber">Numero di telefono</string>
+    <string name="user_password">Password</string>
+    <string name="user_password_confirm">Conferma Password</string>
+    <string name="user_nameemailerror">Nome Utente/E-mail errato</string>
+    <string name="user_shippingerror">Indirizzo errato</string>
+    <string name="user_passworderror">Password errata</string>
+    <string name="profile">Profilo</string>
+    <string name="home">Home</string>
+    <string name="user_page">Pagina utente</string>
+    <string name="purchase">Procedi all\'acquisto</string>
+    <string name="purchase_icon">Icona Acquisto</string>
+    <string name="add_to_wishlist">Aggiungi alla lista desideri</string>
+    <string name="add_to_wishlist_icon">Icona aggiunta lista desideri</string>
+    <string name="description">Descrizione del prodotto</string>
+    <string name="item_image">Immagine del prodotto</string>
+    <string name="search_button_icon">Icona pulsante di ricerca</string>
+    <string name="search_button_text">Ricerca</string>
+    <string name="welcome_title">Benvenuto su Vinteddu</string>
+    <string name="welcome_subtitle">"La seconda migliore app per comprare e vendere prodotti di seconda mano"</string>
+    <string name="search">Ricerca prodotto</string>
+    <string name="search_bar_placeholder">Cerca un prodotto quì.</string>
+    <string name="search_bar_icon">Icona barra di ricerca</string>
+    <string name="item_preview_icon">Icona anteprima prodotto</string>
+    <string name="loading_wait">caricamento…</string>
+    <string name="lost_password">Recupero Password</string>
+    <string name="lost_password_prompt">Recupera password</string>
+    <string name="lost_password_button">Invia codice di recupero</string>
+    <string name="lost_password_subtitle">Invieremo un codice di recupero al tuo indirizzo email</string>
+    <string name="favorites">Preferiti</string>
+    <string name="on_sale">Prodotti in vendita</string>
+    <string name="purchased">Prodotti acquistati</string>
+    <string name="add_item">Aggiungi Prodotto</string>
+    <string name="wallet">Portafoglio</string>
+    <string name="profile_page">Pagina utente</string>
+    <string name="user_shippingAddress">Indirizzo</string>
+</resources>

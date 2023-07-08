@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Vinteddu-Android</string>
-    <string name="title">Vinteddu</string>
+    <string name="title" translatable="false">Vinteddu</string>
     <string name="login_username">Username</string>
     <string name="login_password">Password</string>
     <string name="login">Sign in</string>
@@ -9,7 +9,7 @@
     <string name="register_prompt">New user? Sign up here.</string>
     <string name="drawer_icon">Drawer Icon</string>
     <string name="back">Back</string>
-    <string name="user_firstname">Name</string>
+    <string name="user_firstName">Name</string>
     <string name="user_lastName">Surname</string>
     <string name="user_email">E-mail</string>
     <string name="user_street">Street</string>
@@ -18,7 +18,7 @@
     <string name="user_province">Province</string>
     <string name="user_zipcode">Zip code</string>
     <string name="user_username">Username</string>
-    <string name="user_phonenumber">Phone number</string>
+    <string name="user_phonenumber">Phone Number</string>
     <string name="user_password">Password</string>
     <string name="user_password_confirm">Confirm Password</string>
     <string name="user_nameemailerror">Username/E-mail error</string>
@@ -51,4 +51,6 @@
     <string name="purchased">Purchased items</string>
     <string name="add_item">Add item</string>
     <string name="wallet">Wallet</string>
+    <string name="profile_page">Profile page</string>
+    <string name="user_shippingAddress">Shipping Address</string>
 </resources>
