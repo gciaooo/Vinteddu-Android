@@ -1,22 +1,16 @@
 package it.unical.gciaoo.vinteddu_android.ApiConfig
 import it.unical.gciaoo.vinteddu_android.model.Item
-import it.unical.gciaoo.vinteddu_android.model.User
-import it.unical.gciaoo.vinteddu_android.model.Utente
 import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
 import it.unical.gciaoo.vinteddu_android.model.Wallet
-import okhttp3.HttpUrl
 import retrofit2.http.GET
 import retrofit2.Response
-import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
-import retrofit2.http.Query
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.temporal.TemporalAmount
 
 interface ApiService {
 
@@ -54,8 +48,8 @@ interface ApiService {
     @GET("/api/v3/item/{itemId}")
     suspend fun getItem(@Header("Authorization") token:String?, @Path("itemId") itemId: Long): Response<Item>
 
-    @GET("/api/v3/search/{nome}")
-    suspend fun getSearch(@Header("Authorization") token:String?, @Path("nome") nome: String): Response<List<Item>>
+    @GET("/api/v3/search/{nome}/{token}")
+    suspend fun getSearch(@Header("Authorization") token:String?, @Path("nome") nome: String, @Path("token") token_: String?): Response<List<Item>>
 
     @GET("/api/v2/Favorites/{token}")
     suspend fun getFavorites(@Header("Authorization") token:String?, @Path("token") token_: String): Response<List<Item>>
