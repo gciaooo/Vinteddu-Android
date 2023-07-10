@@ -53,4 +53,16 @@
     <string name="wallet">Wallet</string>
     <string name="profile_page">Profile page</string>
     <string name="user_shippingAddress">Shipping Address</string>
+    <string name="balance">Balance</string>
+    <string name="balance_recharge">Insert your recharge amount</string>
+    <string name="balance_recharge_button_prompt">Recharge Wallet</string>
+    <string name="balance_recharge_ok">Wallet recharged</string>
+    <string name="item_title">Title</string>
+    <string name="item_description">Description of the product</string>
+    <string name="item_price">Price</string>
+    <string name="add_item_image">Upload image</string>
+    <string name="add_item_sale">Put on sale</string>
+    <string name="add_item_ok">Product has been successfully put on sale</string>
+    <string name="wallet_error">Insert a valid number</string>
+    <string name="change_password_ok">A new password has been successfully sent to your email address</string>
 </resources>
