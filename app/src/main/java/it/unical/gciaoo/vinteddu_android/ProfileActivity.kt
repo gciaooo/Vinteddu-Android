@@ -1,7 +1,13 @@
 package it.unical.gciaoo.vinteddu_android
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,15 +19,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,6 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -51,8 +59,6 @@ import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
 import it.unical.gciaoo.vinteddu_android.model.Wallet
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
 import java.lang.Thread.sleep
 import java.text.NumberFormat
 
@@ -359,110 +365,123 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
     val nameState = remember { mutableStateOf("") }
     val descriptionState = remember { mutableStateOf("") }
     val priceState = remember { mutableStateOf("") }
-    var imagePath by remember { mutableStateOf("") }
     val showDialog = remember { mutableStateOf(false) }
-
+    var imageUri by remember { mutableStateOf<Uri?>(null)}
     val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    val bitmap = remember { mutableStateOf<Bitmap?>(null)}
+
+
+
+
+
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri?->
+        imageUri = uri
         // Ottieni il percorso dell'immagine dalla URI
-        val imageFile = File(uri!!.path)
-        if (imageFile.exists()) {
-            // Copia l'immagine nella directory delle immagini dell'app
-            val outputDir = context.filesDir
-            val outputFile = File(outputDir, imageFile.name)
-            val inputStream = context.contentResolver.openInputStream(uri)
-            val outputStream = FileOutputStream(outputFile)
-            inputStream?.copyTo(outputStream)
-            imagePath = outputFile.absolutePath
-        }
     }
-    Column(
-        modifier = Modifier.padding(all = 5.dp),
+    LazyColumn(
+        modifier = Modifier.padding(all = 3.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.weight(0.1f))
-//        Text(
-//            text = stringResource(R.string.login), style = Typography.headlineLarge,
-//            modifier = Modifier
-//                .align(Alignment.Start)
-//                .padding(horizontal = 20.dp)
-//                .weight(0.3f)
-//        )
-        Spacer(modifier = Modifier.weight(0.2f))
-        InputField(name = "Titolo inserzione", commonModifier, nameState)
-        InputField(name = "Descrizione", commonModifier, descriptionState )
-        InputField(name = "Prezzo", commonModifier, priceState )
-//        if (imagePath.isNotEmpty()) {
-//            val imagePainter: Painter = painterResource(R.drawable.felpa)
-//            Image(
-//                painter = imagePainter,
-//                contentDescription = "Immagine selezionata",
-//                modifier = Modifier
-//                    .size(200.dp)
-//                    .padding(16.dp),
-//                contentScale = ContentScale.Crop
-//            )
-//        }
 
-        Button(
-            modifier = commonModifier
-                .padding(vertical = 30.dp)
-                .height(IntrinsicSize.Max),
-            onClick = { launcher.launch("image/*") }
-        ) {
-            Text("Carica immagine")
-        }
+        item {
+            //Spacer(modifier = Modifier.weight(0.1f))
+
+            imageUri?.let {
+                if (Build.VERSION.SDK_INT < 28) {
+                    bitmap.value = MediaStore.Images
+                        .Media.getBitmap(context.contentResolver, it)
+                } else {
+                    val source = ImageDecoder.createSource(context.contentResolver, it)
+                    bitmap.value = ImageDecoder.decodeBitmap(source)
+                }
+
+                bitmap.value?.let { btm ->
+                    Image(
+
+                        bitmap = btm.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.size(400.dp).padding(20.dp)
 
 
-        Button(content = {
-            Text("Metti in vendita")
-
-        },
-            modifier = commonModifier
-                .padding(vertical = 30.dp)
-                .height(IntrinsicSize.Max),
-            onClick = {
-                val nome = nameState.value
-                val descrizione = descriptionState.value
-                val price = priceState.value.toBigDecimal()
-                coroutineScope.launch {
-                    try {
-                        showDialog.value=true
-                        val response = apiService.addItem("Bearer $token",token, nome, descrizione, price, imagePath)
-                    } catch (e: Exception) {
-                        // Si è verificato un errore durante la chiamata API
-                    }
+                    )
                 }
             }
-        )
-        if (showDialog.value) {
-            AlertDialog(
-                onDismissRequest = {
-                    showDialog.value = false
-                },
-                title = {
-                    Text(text = "Oggetto ufficialmente messo in vendita")
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            navHostController.navigate(Routes.HOME.route)
-                            showDialog.value = false // Chiudi il popup
+
+            //Spacer(modifier = Modifier.weight(0.2f))
+            InputField(name = "Titolo inserzione", commonModifier, nameState)
+            InputField(name = "Descrizione", commonModifier, descriptionState)
+            InputField(name = "Prezzo", commonModifier, priceState)
+
+
+
+            Button(
+                modifier = commonModifier
+                    .padding(vertical = 30.dp)
+                    .height(IntrinsicSize.Max),
+                onClick = { launcher.launch("image/*") }
+            ) {
+                Text("Carica immagine")
+            }
+
+
+            Button(content = {
+                Text("Metti in vendita")
+
+            },
+                modifier = commonModifier
+                    .padding(vertical = 30.dp)
+                    .height(IntrinsicSize.Max),
+                onClick = {
+                    val nome = nameState.value
+                    val descrizione = descriptionState.value
+                    val price = priceState.value.toBigDecimal()
+                    coroutineScope.launch {
+                        try {
+                            showDialog.value = true
+                            val response = apiService.addItem(
+                                "Bearer $token",
+                                token,
+                                nome,
+                                descrizione,
+                                price,
+                                imageUri.toString()
+                            )
+                        } catch (e: Exception) {
+                            // Si è verificato un errore durante la chiamata API
                         }
-                    ) {
-                        Text(text = "OK")
                     }
-                },
-                modifier = Modifier.padding(16.dp)
+                }
+            )
+            if (showDialog.value) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showDialog.value = false
+                    },
+                    title = {
+                        Text(text = "Oggetto ufficialmente messo in vendita")
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                navHostController.navigate(Routes.HOME.route)
+                                showDialog.value = false // Chiudi il popup
+                            }
+                        ) {
+                            Text(text = "OK")
+                        }
+                    },
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            //Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "Back Home",
+                modifier = Modifier
+                    .padding(vertical = 15.dp)
+                    .clickable(onClick = { navHostController.navigate(Routes.HOME.route) })
             )
         }
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = "Back Home",
-            modifier = Modifier
-                .padding(vertical = 15.dp)
-                .clickable(onClick = { navHostController.navigate(Routes.HOME.route) })
-        )
     }
 }
 

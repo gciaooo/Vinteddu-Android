@@ -1,6 +1,11 @@
 package it.unical.gciaoo.vinteddu_android
 
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +14,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -47,11 +54,15 @@ import it.unical.gciaoo.vinteddu_android.model.Item
 import it.unical.gciaoo.vinteddu_android.ui.theme.Typography
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.zIndex
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
 import kotlinx.coroutines.launch
 import java.lang.Thread.sleep
 
@@ -194,7 +205,7 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
         .fillMaxWidth()
         .padding(horizontal = 10.dp, vertical = 4.dp)
     val dividerModifier = Modifier.padding(vertical = 10.dp)
-    val imagesState = rememberLazyListState()
+
 
     val token = sessionManager.getToken()
     val coroutineScope = rememberCoroutineScope()
@@ -202,12 +213,16 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
     val showDialog2 = remember { mutableStateOf(false) }
     val showDialog3 = remember { mutableStateOf(false) }
     val item = remember { mutableStateOf<Item?>(null) }
+    val imageUri = remember { mutableStateOf<Uri?>(null)}
+    val context = LocalContext.current
+    val bitmap = remember { mutableStateOf<Bitmap?>(null)}
 
 
     LaunchedEffect(key1 = token/*, key2 = item.value*/){
         val response = apiService.getItem("Bearer $token", itemId)
         sleep(20)
         if(response.isSuccessful){
+            imageUri.value = response.body()!!.immagini.toUri()
             item.value = response.body()
         }
     }
@@ -217,15 +232,34 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
 
     if(item.value!=null){
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top, modifier = Modifier.padding(horizontal = 20.dp)) {
+            imageUri.value?.let { uri->
+                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                bitmap.value = ImageDecoder.decodeBitmap(source)
+
+                bitmap.value?.let { btm ->
+                    Image(
+
+                        bitmap = btm.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.size(400.dp).padding(20.dp)
+
+
+                    )
+                }
+            }
+
+//            imageUri.value?.let { uri ->
+//                Image(
+//                    painter = rememberImagePainter(data = uri),
+//                    contentDescription = null,
+//                    modifier = Modifier.size(400.dp).padding(20.dp)
+//                )
+//            }
+
+
             Text(item.value!!.nome, style = Typography.headlineLarge, modifier = Modifier.align(Alignment.Start))
 
-            LazyRow(state = imagesState, modifier = Modifier.padding(30.dp)) {
-//                items(item.value!!.images) {
-//                    Box(modifier = Modifier.height(100.dp)) {
-//                        Image(bitmap = it.asImageBitmap(), contentDescription = stringResource(R.string.item_image))
-//                    }
-//                }
-            }
+
            // Text(item.value!!.price.toPlainString(), style = Typography.titleLarge)
             Button(onClick = {
                 coroutineScope.launch {

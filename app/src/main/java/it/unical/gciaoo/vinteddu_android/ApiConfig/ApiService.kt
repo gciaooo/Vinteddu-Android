@@ -1,4 +1,5 @@
 package it.unical.gciaoo.vinteddu_android.ApiConfig
+import android.net.Uri
 import it.unical.gciaoo.vinteddu_android.model.Item
 import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
 import it.unical.gciaoo.vinteddu_android.model.Wallet
@@ -66,7 +67,7 @@ interface ApiService {
         @Field("nome") nome: String,
         @Field("descrizione") descrizione: String,
         @Field("prezzo") prezzo: BigDecimal,
-        @Field("immagine") immagine : String
+        @Field("immagine") immagine: String?
     ): Response<String>
 
     @FormUrlEncoded
