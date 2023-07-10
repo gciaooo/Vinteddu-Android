@@ -401,7 +401,9 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
 
                         bitmap = btm.asImageBitmap(),
                         contentDescription = null,
-                        modifier = Modifier.size(400.dp).padding(20.dp)
+                        modifier = Modifier
+                            .size(400.dp)
+                            .padding(20.dp)
 
 
                     )
@@ -409,9 +411,9 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
             }
 
             //Spacer(modifier = Modifier.weight(0.2f))
-            InputField(name = "Titolo inserzione", commonModifier, nameState)
-            InputField(name = "Descrizione", commonModifier, descriptionState)
-            InputField(name = "Prezzo", commonModifier, priceState)
+            InputField(name = stringResource(R.string.item_title), commonModifier, nameState)
+            InputField(name = stringResource(R.string.item_description), commonModifier, descriptionState)
+            InputField(name = stringResource(R.string.item_price), commonModifier, priceState)
 
 
 
@@ -421,12 +423,12 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
                     .height(IntrinsicSize.Max),
                 onClick = { launcher.launch("image/*") }
             ) {
-                Text("Carica immagine")
+                Text(stringResource(R.string.add_item_image))
             }
 
 
             Button(content = {
-                Text("Metti in vendita")
+                Text(stringResource(R.string.add_item_sale))
 
             },
                 modifier = commonModifier
@@ -459,7 +461,7 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
                         showDialog.value = false
                     },
                     title = {
-                        Text(text = "Oggetto ufficialmente messo in vendita")
+                        Text(text = stringResource(R.string.add_item_ok))
                     },
                     confirmButton = {
                         Button(
@@ -502,20 +504,26 @@ fun Wallet(apiService: ApiService, sessionManager: SessionManager, navHostContro
     }
 
     if(wallet.value!=null) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center)
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally)
         {
 
 
             Text(
-                text = "Saldo:$ ${wallet.value?.saldo}",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(16.dp)
+                text = stringResource(R.string.balance),
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 30.dp)
+            )
+            Text(
+                text = wallet.value?.saldo.toString(),
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
 
             Card(
                 modifier = Modifier
-                    .padding(vertical = 8.dp)
+                    .padding(20.dp)
                     .fillMaxWidth(),
             ) {
                 Row(
@@ -529,7 +537,7 @@ fun Wallet(apiService: ApiService, sessionManager: SessionManager, navHostContro
                                     showDialog.value = false
                                 },
                                 title = {
-                                    Text(text = "Inserisci un importo valido")
+                                    Text(text =  stringResource(R.string.wallet_error))
                                 },
                                 confirmButton = {
                                     Button(
@@ -549,7 +557,7 @@ fun Wallet(apiService: ApiService, sessionManager: SessionManager, navHostContro
                                     showDialog2.value = false
                                 },
                                 title = {
-                                    Text(text = "Wallet ricaricato")
+                                    Text(text = stringResource(R.string.balance_recharge_ok))
                                 },
                                 confirmButton = {
                                     Button(
@@ -564,9 +572,21 @@ fun Wallet(apiService: ApiService, sessionManager: SessionManager, navHostContro
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
+                        TextField(
+                            value = intFieldValue,
+                            onValueChange = { value ->
+                                intFieldValue = value.takeIf { it.isEmpty() || it.toIntOrNull() != null } ?: intFieldValue
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            label = { Text(stringResource(R.string.balance_recharge)) },
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(bottom = 16.dp)
+                                .fillMaxWidth()
+                        )
                         Button(
                             content = {
-                                Text("Ricarica wallet")
+                                Text(stringResource(R.string.balance_recharge_button_prompt))
                             },
                             modifier = commonModifier
                                 .fillMaxWidth()
@@ -576,7 +596,7 @@ fun Wallet(apiService: ApiService, sessionManager: SessionManager, navHostContro
                                 coroutineScope.launch {
                                     try {
                                         val intValue = intFieldValue.toIntOrNull()
-                                        if (intValue != null) {
+                                        if (intValue != null && intValue > 0) {
                                             val resp = apiService.wallet_recharge(
                                                 "Bearer $token",
                                                 token,
@@ -593,18 +613,6 @@ fun Wallet(apiService: ApiService, sessionManager: SessionManager, navHostContro
                                     }
                                 }
                             },
-                        )
-                        TextField(
-                            value = intFieldValue,
-                            onValueChange = { value ->
-                                intFieldValue = value.takeIf { it.isEmpty() || it.toIntOrNull() != null } ?: intFieldValue
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            label = { Text("Inserisci l'importo della ricarica") },
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(bottom = 16.dp)
-                                .fillMaxWidth()
                         )
 
                     }
