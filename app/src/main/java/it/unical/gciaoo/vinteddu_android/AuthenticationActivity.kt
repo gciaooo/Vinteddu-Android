@@ -108,6 +108,7 @@ fun Login(navHostController: NavHostController, apiService: ApiService, sessionM
             content = { Text(stringResource(R.string.register_prompt)) },
             modifier = commonModifier
                 .padding(vertical = 5.dp)
+                .height(IntrinsicSize.Max)
         )
         Spacer(modifier = Modifier.weight(1f))
     }
@@ -435,7 +436,7 @@ fun PasswordLostPage(navHostController: NavHostController, apiService: ApiServic
                     showDialog.value = false
                 },
                 title = {
-                    Text(text = "Nuova password inviata all'indirizzo email")
+                    Text(text = stringResource(R.string.change_password_ok))
                 },
                 confirmButton = {
                     Button(

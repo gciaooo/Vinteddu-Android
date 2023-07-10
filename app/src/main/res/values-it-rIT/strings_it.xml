@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Vinteddu-Android</string>
-    <string name="title" translatable="false">Vinteddu</string>
     <string name="login_username">Nome Utente</string>
     <string name="login_password">Password</string>
     <string name="login">Login</string>
@@ -54,4 +53,15 @@
     <string name="wallet">Portafoglio</string>
     <string name="profile_page">Pagina utente</string>
     <string name="user_shippingAddress">Indirizzo</string>
+    <string name="balance">Saldo</string>
+    <string name="balance_recharge">Inserisci l\'importo della ricarica</string>
+    <string name="balance_recharge_button_prompt">Ricarica Portafoglio</string>
+    <string name="balance_recharge_ok">Portafoglio ricaricato</string>
+    <string name="item_title">TItolo</string>
+    <string name="item_description">Descrizione del prodotto</string>
+    <string name="item_price">Prezzo</string>
+    <string name="add_item_image">Carica immagine</string>
+    <string name="add_item_sale">Metti in vendita</string>
+    <string name="add_item_ok">Prodotto ufficialmente messo in vendita</string>
+    <string name="wallet_error">Inserisci un importo valido</string>
 </resources>
