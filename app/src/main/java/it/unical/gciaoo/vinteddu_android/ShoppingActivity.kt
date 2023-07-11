@@ -1,10 +1,13 @@
 package it.unical.gciaoo.vinteddu_android
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +27,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -55,6 +59,7 @@ import it.unical.gciaoo.vinteddu_android.ui.theme.Typography
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
@@ -62,9 +67,27 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
+import coil.ImageLoader
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import kotlinx.coroutines.launch
 import java.lang.Thread.sleep
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.DisposableEffect
+import androidx.core.content.ContextCompat
+import android.Manifest
+import android.app.LocalActivityManager
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.core.app.ActivityCompat
+import androidx.core.graphics.drawable.toBitmap
+import java.io.File
+
 
 @ExperimentalMaterial3Api
 @Composable
@@ -218,11 +241,12 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
     val bitmap = remember { mutableStateOf<Bitmap?>(null)}
 
 
+
     LaunchedEffect(key1 = token/*, key2 = item.value*/){
         val response = apiService.getItem("Bearer $token", itemId)
         sleep(20)
         if(response.isSuccessful){
-            imageUri.value = response.body()!!.immagini.toUri()
+            imageUri.value = response.body()!!.immagini?.toUri()
             item.value = response.body()
         }
     }
@@ -232,20 +256,46 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
 
     if(item.value!=null){
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top, modifier = Modifier.padding(horizontal = 20.dp)) {
-            imageUri.value?.let { uri->
-                val source = ImageDecoder.createSource(context.contentResolver, uri)
-                bitmap.value = ImageDecoder.decodeBitmap(source)
+//            imageUri.value?.let { uri->
+//                val source = ImageDecoder.createSource(context.contentResolver, uri)
+//                bitmap.value = ImageDecoder.decodeBitmap(source)
+//
+//                bitmap.value?.let { btm ->
+//                    Image(
+//
+//                        bitmap = btm.asImageBitmap(),
+//                        contentDescription = null,
+//                        modifier = Modifier.size(400.dp).padding(20.dp)
+//
+//
+//                    )
+//                }
+//            }
 
-                bitmap.value?.let { btm ->
-                    Image(
+            if(item.value!!.immagini==""){
 
-                        bitmap = btm.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier.size(400.dp).padding(20.dp)
+                Icon(
+                    Icons.Default.Build,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(5.dp)
 
+                )
 
-                    )
-                }
+            }
+            else{
+                Image(
+                    painter = rememberImagePainter(
+                        data = item.value!!.immagini,
+                        builder = {
+                            crossfade(true)
+                        }
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(200.dp),
+                    contentScale = ContentScale.FillBounds
+                )
             }
 
 //            imageUri.value?.let { uri ->
@@ -424,3 +474,18 @@ fun ItemPreview(
         modifier = modifier
     )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

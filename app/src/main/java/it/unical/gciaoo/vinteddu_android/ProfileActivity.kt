@@ -1,5 +1,6 @@
 package it.unical.gciaoo.vinteddu_android
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import it.unical.gciaoo.vinteddu_android.ApiConfig.ApiService
 import it.unical.gciaoo.vinteddu_android.ApiConfig.SessionManager
@@ -59,6 +61,8 @@ import it.unical.gciaoo.vinteddu_android.model.UtenteDTO
 import it.unical.gciaoo.vinteddu_android.model.Wallet
 import it.unical.gciaoo.vinteddu_android.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 import java.lang.Thread.sleep
 import java.text.NumberFormat
 
@@ -379,6 +383,8 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
         imageUri = uri
         // Ottieni il percorso dell'immagine dalla URI
     }
+
+
     LazyColumn(
         modifier = Modifier.padding(all = 3.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -448,6 +454,7 @@ fun AddItem(navHostController: NavHostController, apiService: ApiService, sessio
                                 descrizione,
                                 price,
                                 imageUri.toString()
+
                             )
                         } catch (e: Exception) {
                             // Si è verificato un errore durante la chiamata API
@@ -496,6 +503,7 @@ fun Wallet(apiService: ApiService, sessionManager: SessionManager, navHostContro
     var intFieldValue by remember { mutableStateOf("") }
     val showDialog = remember { mutableStateOf(false) }
     val showDialog2 = remember { mutableStateOf(false) }
+
     LaunchedEffect(key1 = token, key2 = wallet){
         val response = apiService.getSaldo("Bearer $token", token!!)
         if(response.isSuccessful){
@@ -643,4 +651,6 @@ fun updateProfile(utente: UtenteDTO?, userViewModel: UserViewModel) {
     }
 
 }
+
+
 

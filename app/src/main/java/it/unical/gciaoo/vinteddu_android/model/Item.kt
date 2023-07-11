@@ -1,5 +1,6 @@
 package it.unical.gciaoo.vinteddu_android.model
 
+import android.graphics.Bitmap
 import java.math.BigDecimal
 
 
@@ -27,5 +28,5 @@ data class Item(
     val dataCreazione: List<Int>?,
     val stato: String,
     val idUtente: Long?,
-    var immagini: /*List<Bitmap>*/ String
+    var immagini: String?
 )
