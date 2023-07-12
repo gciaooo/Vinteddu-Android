@@ -204,6 +204,17 @@ fun PaginaPreferiti(apiService: ApiService, sessionManager: SessionManager, navH
             }
         }
     }else{
+        Column(
+            modifier = Modifier.padding(16.dp)
+
+        ) {
+            Text(
+                text = "You must add favorites",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
         sleep(3000)
     }
 }
@@ -254,15 +265,8 @@ fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManag
 
                             Spacer(modifier = Modifier.width(16.dp))
                             Column {
-                                ClickableText(
-                                    text = AnnotatedString(prodotto.nome),
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            navHostController.navigate("items/${prodotto.id}")
-                                        }
-
-
-                                    },
+                                Text(
+                                    text = prodotto.nome,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(
@@ -281,6 +285,17 @@ fun PaginaProdottiInVendita(apiService: ApiService, sessionManager: SessionManag
 
         }
     }else{
+        Column(
+            modifier = Modifier.padding(16.dp)
+
+        ) {
+            Text(
+                text = "You have to put items up for sale",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
         sleep(3000)
     }
 }
@@ -350,6 +365,17 @@ fun PaginaProdottiAcquistati(apiService: ApiService, sessionManager: SessionMana
             }
         }
     }else{
+        Column(
+            modifier = Modifier.padding(16.dp)
+
+        ) {
+            Text(
+                text = "You have not purchased items",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
         sleep(3000)
     }
 }

@@ -272,14 +272,14 @@ fun ItemPage(apiService: ApiService, sessionManager: SessionManager, itemId: Lon
 //                }
 //            }
 
-            if(item.value!!.immagini==""){
+            if(item.value!!.immagini=="null"){
 
                 Icon(
-                    Icons.Default.Build,
+                    imageVector = Icons.Filled.ShoppingCart,
                     contentDescription = null,
                     modifier = Modifier
                         .size(120.dp)
-                        .padding(5.dp)
+                        .padding(10.dp)
 
                 )
 
